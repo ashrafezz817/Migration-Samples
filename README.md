@@ -27,7 +27,7 @@ The figures below are taken from the Oracle Forms exports and are intended to pr
 | Nationalities      |    1 |   6 |      6 |           5 |  0 |       0 |         0 |     0 |
 | Discount Packages  |    3 |   24 |      14 |           8 |  1 |       1 |         0 |     0 |
 | Clinics            |    1 |   26 |      9 |           6 |  1 |       0 |         0 |     0 |
-| Small Cash Invoice |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
+| Small Cash Invoice |    5 |   202 |      95 |           30 |  15 |       2 |         1 |     1 |
 | Patient            |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
 
 > **Note:** Database package and report counts represent dependencies referenced by the Form and are not intended to represent the complete dependency tree of the underlying database objects.
