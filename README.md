@@ -19,7 +19,7 @@ The complete application contains approximately **500 Oracle Forms**, with busin
 
 ## Technical Profile
 
-The figures below are taken from the Oracle Forms XML exports and are intended to provide a high-level indication of the technical footprint of each sample.
+The figures below are taken from the Oracle Forms exports and are intended to provide a high-level indication of the technical footprint of each sample.
 
 | Sample             | Blocks | Items | Triggers | Program Units | LOVs | Relations | DB Packages | Reports |
 | ------------------ | -----: | ----: | -------: | ------------: | ---: | --------: | ----------: | ------: |
