@@ -34,7 +34,7 @@ The figures below are taken from the Oracle Forms XML exports and are intended t
 
 ## Complexity Classification
 
-The classifications used in this repository are intended to describe the expected **Forms-to-APEX migration effort**, rather than the business importance of the function.
+The classifications used in this repository are intended to describe the expected **Forms-to-APEX migration effort**.
 
 ### Simple
 
