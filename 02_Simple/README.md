@@ -80,7 +80,7 @@ The legacy `PRE-INSERT` logic generates a new nationality identifier using:
 
 ### Database Packages
 
-No direct Oracle database package dependencies were identified in the Form.
+No direct Oracle database package dependencies in the Form.
 
 ### Database Functions / Procedures
 
