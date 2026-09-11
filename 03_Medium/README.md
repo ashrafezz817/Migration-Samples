@@ -109,7 +109,7 @@ The legacy implementation generates identifiers using `MAX(...) + 1` patterns fo
 
 ### Database Packages
 
-No direct Oracle database package dependencies were identified in the Form.
+No direct Oracle database package dependencies in the Form.
 
 ### Database Functions / Procedures
 
@@ -154,11 +154,11 @@ The legacy Forms relation automatically coordinates detail queries and prevents 
 
 ### Other Forms
 
-No significant cross-Form dependency was identified.
+No significant cross-Form dependency.
 
 ### Reports
 
-No report objects or report execution dependencies were identified.
+No report objects or report execution dependencies.
 
 ### Shared Forms Libraries
 
