@@ -6,6 +6,8 @@ This repository contains representative samples from an existing Healthcare Info
 
 The complete application contains approximately **500 Oracle Forms**, with business logic distributed between Oracle Forms and the Oracle Database.
 
+The samples are representative examples only and should not be interpreted as the complexity distribution of the complete application.
+
 ## Sample Overview
 
 | Sample                              | Area               | Complexity | Purpose                             |
@@ -21,7 +23,7 @@ The complete application contains approximately **500 Oracle Forms**, with busin
 
 The figures below are taken from the Oracle Forms exports and are intended to provide a high-level indication of the technical footprint of each sample.
 
-| Sample             | Blocks | Items | Triggers | Program Units | LOVs | Relations | DB Packages | Reports |
+| Sample             | Blocks | Items | Triggers | Program Units | LOVs | Relations | DB Packages | Report Objects |
 | ------------------ | -----: | ----: | -------: | ------------: | ---: | --------: | ----------: | ------: |
 | Cashier Shift Open |    2 |   8 |      6 |           3 |  1 |       0 |         0 |     0 |
 | Nationalities      |    1 |   6 |      6 |           5 |  0 |       0 |         0 |     0 |
@@ -30,7 +32,7 @@ The figures below are taken from the Oracle Forms exports and are intended to pr
 | Small Cash Invoice |    5 |   202 |      95 |           30 |  15 |       2 |         1 |     1 |
 | Patient            |    2 |   170 |      119 |           20 |  10 |       0 |         2 |     0 |
 
-> **Note:** Database package and report counts represent dependencies referenced by the Form and are not intended to represent the complete dependency tree of the underlying database objects.
+> **Note:** Blocks, Items, Triggers, Program Units, LOVs, Relations, and Report Objects are structural object counts taken from the Oracle Forms XML exports. DB Packages represents distinct active Oracle database package references identified in the Form code. External reports, database objects, shared libraries, other Forms, and indirect dependencies are documented separately and are not necessarily reflected in these counts.
 
 ## Complexity Classification
 
@@ -106,3 +108,11 @@ Individual Forms may reference shared application components that are not includ
 * Shared localization and user-interface utilities
 
 The individual sample README files identify significant dependencies where they are relevant to understanding the migration effort.
+
+## Assessment Scope
+
+These samples are intended to support an initial migration assessment and budgetary estimate.
+
+A detailed implementation estimate would require review of the complete Forms inventory, dependency relationships, shared libraries, database logic, reporting requirements, integrations, and the complexity distribution of the remaining Forms.
+
+The migration should preserve required business behavior, but a direct one-to-one reproduction of every Oracle Forms implementation detail is not expected where a more appropriate Oracle APEX or database-based design is available.
