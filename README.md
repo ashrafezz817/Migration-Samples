@@ -106,9 +106,3 @@ Individual Forms may reference shared application components that are not includ
 * Shared localization and user-interface utilities
 
 The individual sample README files identify significant dependencies where they are relevant to understanding the migration effort.
-
-## Purpose of These Samples
-
-The samples are provided to support an initial technical assessment and migration estimate.
-
-A detailed migration plan and final effort estimate should take into account the complete application inventory, shared dependencies, database architecture, business-critical workflows, and the distribution of Simple, Medium, and Complex Forms across the full application.
