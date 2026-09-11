@@ -24,7 +24,7 @@ The figures below are taken from the Oracle Forms exports and are intended to pr
 | Sample             | Blocks | Items | Triggers | Program Units | LOVs | Relations | DB Packages | Reports |
 | ------------------ | -----: | ----: | -------: | ------------: | ---: | --------: | ----------: | ------: |
 | Cashier Shift Open |    2 |   8 |      6 |           3 |  1 |       0 |         0 |     0 |
-| Nationalities      |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
+| Nationalities      |    1 |   6 |      6 |           5 |  0 |       0 |         0 |     0 |
 | Discount Packages  |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
 | Clinics            |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
 | Small Cash Invoice |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
