@@ -91,10 +91,6 @@ Examples may include:
 
 * Moving business logic from Forms triggers into reusable database APIs
 * Replacing Forms navigation with APEX application navigation
-* Replacing Forms LOVs with APEX LOVs
-* Replacing Forms master-detail behavior with appropriate APEX components
-* Modernizing security and authorization
-* Replacing Oracle Reports where appropriate
 * Removing obsolete or unused Forms logic
 * Improving concurrency and transaction handling where legacy implementations require modernization
 
