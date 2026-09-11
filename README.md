@@ -90,7 +90,6 @@ Where appropriate, existing functionality may be redesigned using Oracle APEX ca
 Examples may include:
 
 * Moving business logic from Forms triggers into reusable database APIs
-* Replacing Forms navigation with APEX application navigation
 * Removing obsolete or unused Forms logic
 * Improving concurrency and transaction handling where legacy implementations require modernization
 
