@@ -6,6 +6,8 @@ This repository contains representative samples from an existing Healthcare Info
 
 The complete application contains approximately **500 Oracle Forms**, with business logic distributed between Oracle Forms and the Oracle Database.
 
+These samples were selected to represent different functional areas and levels of migration complexity.
+
 The samples are representative examples only and should not be interpreted as the complexity distribution of the complete application.
 
 ## Sample Overview
