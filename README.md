@@ -26,7 +26,7 @@ The figures below are taken from the Oracle Forms exports and are intended to pr
 | Cashier Shift Open |    2 |   8 |      6 |           3 |  1 |       0 |         0 |     0 |
 | Nationalities      |    1 |   6 |      6 |           5 |  0 |       0 |         0 |     0 |
 | Discount Packages  |    3 |   24 |      14 |           8 |  1 |       1 |         0 |     0 |
-| Clinics            |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
+| Clinics            |    1 |   26 |      9 |           6 |  1 |       0 |         0 |     0 |
 | Small Cash Invoice |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
 | Patient            |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
 
