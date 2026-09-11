@@ -23,7 +23,7 @@ The figures below are taken from the Oracle Forms XML exports and are intended t
 
 | Sample             | Blocks | Items | Triggers | Program Units | LOVs | Relations | DB Packages | Reports |
 | ------------------ | -----: | ----: | -------: | ------------: | ---: | --------: | ----------: | ------: |
-| Cashier Shift Open |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
+| Cashier Shift Open |    2 |   8 |      6 |           3 |  1 |       0 |         0 |     0 |
 | Nationalities      |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
 | Discount Packages  |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
 | Clinics            |    TBD |   TBD |      TBD |           TBD |  TBD |       TBD |         TBD |     TBD |
