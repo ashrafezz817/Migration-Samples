@@ -1,0 +1,579 @@
+page 25 (
+    name: Manage Nationality
+    alias: MANAGE-NATIONALITY
+    title: Manage Nationality
+    pageGroup: @reference-data
+    appearance {
+        pageMode: modalDialog
+        dialogTemplate: @/modal-dialog
+        templateOptions: #DEFAULT#
+    }
+    dialog {
+        chained: false
+        resizable: false
+    }
+    security {
+        authorizationScheme: @has-permission
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+    }
+    advanced {
+        enableDuplicatePageSubmissions: false
+    }
+
+    region buttons (
+        name: Buttons
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: REGION_POSITION_03
+        }
+        appearance {
+            template: @/buttons-container
+            templateOptions: #DEFAULT#
+        }
+        accessibility {
+            useLandmark: false
+        }
+    )
+
+    region manage-nationality-form (
+        name: Manage Nationality Form
+        type: form
+        source {
+            location: localDatabase
+            tableName: NATIONALITY
+        }
+        layout {
+            sequence: 50
+            slot: regionBody
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    pageItem P25_LANG (
+        type: selectList
+        label {
+            label: Default Language
+            alignment: left
+        }
+        lov {
+            type: staticValues
+            staticValues: STATIC:Arabic;A,English;E
+            displayExtraValues: false
+            nullDisplayValue: Not Set
+        }
+        layout {
+            sequence: 120
+            region: @manage-nationality-form
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            height: 1
+        }
+        source {
+            formRegion: @manage-nationality-form
+            column: LANG
+            dataType: varchar2
+        }
+    )
+
+    pageItem P25_NATDESC (
+        type: textField
+        label {
+            label: Name (EN)
+            alignment: left
+        }
+        layout {
+            sequence: 80
+            region: @manage-nationality-form
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/required-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        validation {
+            valueRequired: true
+            maxLength: 100
+        }
+        advanced {
+            cssClasses: en
+        }
+        source {
+            formRegion: @manage-nationality-form
+            column: NATDESC
+            dataType: varchar2
+        }
+    )
+
+    pageItem P25_NATDESC_AR (
+        type: textField
+        label {
+            label: Name (AR)
+            alignment: left
+        }
+        layout {
+            sequence: 90
+            region: @manage-nationality-form
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/required-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        validation {
+            valueRequired: true
+            maxLength: 100
+        }
+        advanced {
+            cssClasses: ar
+        }
+        source {
+            formRegion: @manage-nationality-form
+            column: NATDESC_AR
+            dataType: varchar2
+        }
+    )
+
+    pageItem P25_NATDESC_SHORT (
+        type: textField
+        label {
+            label: Nationality Code
+            alignment: left
+        }
+        layout {
+            sequence: 100
+            region: @manage-nationality-form
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        validation {
+            maxLength: 20
+        }
+        source {
+            formRegion: @manage-nationality-form
+            column: NATDESC_SHORT
+            dataType: varchar2
+        }
+    )
+
+    pageItem P25_NATID (
+        type: hidden
+        layout {
+            sequence: 70
+            region: @manage-nationality-form
+            slot: regionBody
+        }
+        source {
+            formRegion: @manage-nationality-form
+            column: NATID
+            dataType: number
+            primaryKey: true
+        }
+        security {
+            sessionStateProtection: checksumRequiredSessionLevel
+        }
+    )
+
+    pageItem P25_PAY_VAT (
+        type: switch
+        label {
+            label: VAT Applicable
+            alignment: left
+        }
+        settings {
+            useDefaults: false
+            onValue: Y
+            offValue: N
+        }
+        layout {
+            sequence: 130
+            region: @manage-nationality-form
+            slot: regionBody
+            alignment: left
+            column: 1
+            labelColumnSpan: 3
+        }
+        appearance {
+            template: @/required
+            templateOptions: #DEFAULT#
+            cssClasses: app-switch-row
+        }
+        validation {
+            valueRequired: true
+        }
+        source {
+            formRegion: @manage-nationality-form
+            column: PAY_VAT
+            dataType: varchar2
+        }
+        default {
+            type: static
+            staticValue: Y
+        }
+    )
+
+    pageItem P25_SORT_ORDER (
+        type: numberField
+        label {
+            label: Sort Order
+            alignment: left
+        }
+        settings {
+            minValue: 0
+            virtualKeyboard: numeric
+        }
+        layout {
+            sequence: 110
+            region: @manage-nationality-form
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        source {
+            formRegion: @manage-nationality-form
+            column: SORT_ORDER
+            dataType: number
+        }
+    )
+
+    pageItem P25_STATUS (
+        type: switch
+        label {
+            label: Status
+            alignment: left
+        }
+        settings {
+            useDefaults: false
+            onValue: ACTIVE
+            offValue: INACTIVE
+        }
+        layout {
+            sequence: 140
+            region: @manage-nationality-form
+            slot: regionBody
+            alignment: left
+            startNewRow: false
+        }
+        appearance {
+            template: @/required
+            templateOptions: #DEFAULT#
+            cssClasses: app-switch-row
+        }
+        validation {
+            valueRequired: true
+        }
+        source {
+            formRegion: @manage-nationality-form
+            column: STATUS
+            dataType: varchar2
+        }
+        default {
+            type: static
+            staticValue: ACTIVE
+        }
+    )
+
+    button cancel (
+        buttonName: CANCEL
+        label: Cancel
+        layout {
+            sequence: 10
+            region: @buttons
+            slot: CLOSE
+        }
+        appearance {
+            buttonTemplate: @/text
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: definedByDynamicAction
+            executeValidations: false
+        }
+    )
+
+    button create (
+        buttonName: CREATE
+        label: Create
+        layout {
+            sequence: 10
+            region: @buttons
+            slot: CREATE
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            showProcessing: true
+            warnOnUnsavedChanges: doNotCheck
+            databaseAction: insert
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P25_NATID is null
+                and fnd_app_security.has_permission('NAT_MANAGE') = 'TRUE'
+                ```
+        }
+    )
+
+    button save (
+        buttonName: SAVE
+        label: Apply Changes
+        layout {
+            sequence: 10
+            region: @buttons
+            slot: EDIT
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            warnOnUnsavedChanges: doNotCheck
+            databaseAction: update
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P25_NATID is not null
+                and fnd_app_security.has_permission('NAT_MANAGE') = 'TRUE'
+                ```
+        }
+    )
+
+    dynamicAction cancel-dialog (
+        name: Cancel Dialog
+        execution {
+            sequence: 10
+        }
+        when {
+            event: click
+            selectionType: button
+            button: @cancel
+        }
+
+        action native-dialog-cancel (
+            action: cancelDialog
+            execution {
+                sequence: 10
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    validation lang-input-control (
+        name: lang input control
+        execution {
+            sequence: 60
+        }
+        validation {
+            plsqlExpression: :P25_LANG is null or :P25_LANG in ('A', 'E')
+        }
+        error {
+            errorMessage: Default Language must be Arabic or English.
+            associatedItem: @P25_LANG
+        }
+    )
+
+    validation pay-vat-input-control (
+        name: pay_vat input control
+        execution {
+            sequence: 40
+        }
+        validation {
+            plsqlExpression: :P25_PAY_VAT in ('Y', 'N')
+        }
+        error {
+            errorMessage: VAT Applicable must be Yes or No.
+            associatedItem: @P25_PAY_VAT
+        }
+    )
+
+    validation status-input-control (
+        name: status input control
+        execution {
+            sequence: 50
+        }
+        validation {
+            plsqlExpression: :P25_STATUS in ('ACTIVE', 'INACTIVE')
+        }
+        error {
+            errorMessage: Status must be Active or Inactive.
+            associatedItem: @P25_STATUS
+        }
+    )
+
+    validation unique-natdesc (
+        name: unique natdesc
+        execution {
+            sequence: 10
+        }
+        validation {
+            type: noRowsReturned
+            sqlQuery:
+                ```sql
+                select 1
+                  from nationality
+                 where upper(trim(natdesc)) = upper(trim(:P25_NATDESC))
+                   and (:P25_NATID is null or natid <> :P25_NATID)
+                ```
+        }
+        error {
+            errorMessage: This nationality name already exists.
+            associatedItem: @P25_NATDESC
+        }
+    )
+
+    validation unique-natdesc-ar (
+        name: unique natdesc_ar
+        execution {
+            sequence: 20
+        }
+        validation {
+            type: noRowsReturned
+            sqlQuery:
+                ```sql
+                select 1
+                  from nationality
+                 where trim(natdesc_ar) = trim(:P25_NATDESC_AR)
+                   and (:P25_NATID is null or natid <> :P25_NATID)
+                ```
+        }
+        error {
+            errorMessage: This Arabic nationality name already exists.
+            associatedItem: @P25_NATDESC_AR
+        }
+    )
+
+    validation unique-nationality-code (
+        name: unique nationality code
+        execution {
+            sequence: 30
+        }
+        validation {
+            type: noRowsReturned
+            sqlQuery:
+                ```sql
+                select 1
+                  from nationality
+                 where upper(trim(natdesc_short)) = upper(trim(:P25_NATDESC_SHORT))
+                   and :P25_NATDESC_SHORT is not null
+                   and (:P25_NATID is null or natid <> :P25_NATID)
+                ```
+        }
+        error {
+            errorMessage: This nationality code already exists.
+            associatedItem: @P25_NATDESC_SHORT
+        }
+    )
+
+    process close-dialog (
+        name: Close Dialog
+        type: closeDialog
+        execution {
+            sequence: 30
+        }
+        advanced {
+            executionMappingIdentifier: 40583813064896970
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CREATE,SAVE
+        }
+    )
+
+    process initialize-manage-nationalities-form (
+        name: Initialize Manage Nationalities Form
+        type: formInitialization
+        formRegion: @manage-nationality-form
+        execution {
+            sequence: 10
+            point: beforeHeader
+        }
+        advanced {
+            executionMappingIdentifier: 40580151531896954
+        }
+    )
+
+    process manage-nationalities-process (
+        name: Manage Nationalities Process
+        type: formAutoRowProcessing
+        formRegion: @manage-nationality-form
+        execution {
+            sequence: 20
+        }
+        successMessage {
+            successMessage: Nationality saved successfully.
+        }
+        advanced {
+            executionMappingIdentifier: 40580500220896956
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :REQUEST in ('CREATE', 'SAVE')
+                and fnd_app_security.has_permission('NAT_MANAGE') = 'TRUE'
+                ```
+        }
+    )
+
+    process set-natid-from-sequence (
+        name: Set NATID From Sequence
+        type: executeCode
+        source {
+            plsqlCode:
+                ```plsql
+                begin
+                    select nationality_seq.nextval
+                      into :P25_NATID
+                      from dual;
+                end;
+                ```
+        }
+        execution {
+            sequence: 10
+        }
+        advanced {
+            executionMappingIdentifier: 40587166142899019
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :REQUEST = 'CREATE'
+                and :P25_NATID is null
+                and fnd_app_security.has_permission('NAT_MANAGE') = 'TRUE'
+                ```
+        }
+    )
+
+)
+

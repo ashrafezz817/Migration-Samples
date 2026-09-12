@@ -1,0 +1,892 @@
+page 24 (
+    name: Nationalities
+    alias: NATIONALITIES
+    title: Nationalities
+    pageGroup: @reference-data
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        warnOnUnsavedChanges: false
+    }
+    css {
+        inline:
+            ```css
+            /* ================= Status Toggle: Nationalities IR ================ */
+            
+            #nationalities_ir .nat-status-toggle {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              min-width: 2rem;
+              min-height: 2rem;
+              border: 0;
+              border-radius: 0.5rem;
+              background: transparent;
+              text-decoration: none;
+              cursor: pointer;
+            }
+            
+            #nationalities_ir .nat-status-toggle .fa {
+              font-size: 1.25rem;
+            }
+            
+            #nationalities_ir .status-toggle--on {
+              color: #16a34a;
+            }
+            
+            #nationalities_ir .status-toggle--off {
+              color: #94a3b8;
+            }
+            
+            #nationalities_ir .status-toggle--invalid {
+              color: #dc2626;
+            }
+            
+            #nationalities_ir .nat-status-toggle:hover {
+              background: rgba(148, 163, 184, 0.15);
+            }
+            
+            #nationalities_ir .nat-status-toggle:focus {
+              outline: 2px solid var(--ut-focus-outline-color, #2563eb);
+              outline-offset: 2px;
+            }
+            
+            
+            /* ================= edit link: Nationalities IR ================ */
+            #nationalities_ir .nat-edit-link {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              min-width: 2rem;
+              min-height: 2rem;
+              border-radius: 0.5rem;
+              text-decoration: none;
+            }
+            
+            #nationalities_ir .nat-edit-link:hover {
+              background: rgba(148, 163, 184, 0.15);
+            }
+            
+            #nationalities_ir .nat-edit-link:focus {
+              outline: 2px solid var(--ut-focus-outline-color, #2563eb);
+              outline-offset: 2px;
+            }
+            ```
+    }
+    security {
+        authorizationScheme: @has-permission
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+    }
+    advanced {
+        enableDuplicatePageSubmissions: false
+    }
+
+    region breadcrumb (
+        name: Breadcrumb
+        type: breadcrumb
+        source {
+            breadcrumb: @breadcrumb
+        }
+        layout {
+            sequence: 20
+            slot: regionBody
+        }
+        appearance {
+            template: @/title-bar
+            templateOptions: [
+                #DEFAULT#
+                t-BreadcrumbRegion--useBreadcrumbTitle
+            ]
+        }
+        componentAppearance {
+            breadcrumbTemplate: @/breadcrumb
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region container (
+        name: Container
+        type: staticContent
+        layout {
+            sequence: 40
+            slot: regionBody
+        }
+        appearance {
+            template: @/standard
+            templateOptions: [
+                #DEFAULT#
+                t-Region--noPadding
+                t-Region--removeHeader js-removeLandmark
+            ]
+        }
+        accessibility {
+            useLandmark: false
+        }
+    )
+
+    region nationalities (
+        name: Nationalities
+        title: Nationalities
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: regionBody
+        }
+        appearance {
+            template: @/title-bar
+            templateOptions: [
+                #DEFAULT#
+                t-BreadcrumbRegion--useRegionTitle
+            ]
+        }
+    )
+
+    region nationalities-report (
+        name: Nationalities Report
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                select
+                       case
+                         when nvl(is_system, 'N') = 'N'
+                          and fnd_app_security.has_permission('NAT_MANAGE') = 'TRUE'
+                         then
+                           '<a href="' ||
+                           apex_escape.html_attribute(
+                             apex_page.get_url(
+                               p_page               => 25,
+                               p_clear_cache        => '25',
+                               p_items              => 'P25_NATID',
+                               p_values             => to_char(natid),
+                               p_triggering_element => 'this'
+                             )
+                           ) ||
+                           '" class="nat-edit-link" title="Edit ' ||
+                           apex_escape.html_attribute(natdesc) ||
+                           '" aria-label="Edit ' ||
+                           apex_escape.html_attribute(natdesc) ||
+                           '">' ||
+                             '<span class="fa fa-edit" aria-hidden="true"></span>' ||
+                             '<span class="u-VisuallyHidden">Edit</span>' ||
+                           '</a>'
+                       end as edit_link,
+                
+                       natid,
+                       natdesc,
+                       natdesc_ar,
+                       natdesc_short,
+                       sort_order,
+                       is_system,
+                
+                       pay_vat,
+                       case pay_vat
+                         when 'Y' then 'Yes'
+                         when 'N' then 'No'
+                         else 'Not Set'
+                       end as pay_vat_display,
+                
+                       lang,
+                       case lang
+                         when 'A' then 'Arabic'
+                         when 'E' then 'English'
+                         else 'Not Set'
+                       end as lang_display,
+                
+                       status,
+                       case status
+                         when 'ACTIVE' then 'Active'
+                         when 'INACTIVE' then 'Inactive'
+                         else 'Invalid'
+                       end as active_label,
+                
+                       case status
+                         when 'ACTIVE' then 'fa-toggle-on status-toggle--on'
+                         when 'INACTIVE' then 'fa-toggle-off status-toggle--off'
+                         else 'fa-exclamation-triangle status-toggle--invalid'
+                       end as active_icon_class,
+                
+                       created_by,
+                       creation_date,
+                       last_updated_by,
+                       last_update_date
+                  from nationality
+                 order by sort_order asc,
+                          upper(natdesc),
+                          natid;
+                ```
+        }
+        layout {
+            sequence: 10
+            parentRegion: @container
+            slot: subRegions
+        }
+        appearance {
+            template: @/interactive-report
+            templateOptions: [
+                #DEFAULT#
+                t-IRR-region--noBorders
+                js-showMaximizeButton
+                t-IRR-region--hideHeader js-addHiddenHeadingRoleDesc
+            ]
+        }
+        advanced {
+            htmlDomId: nationalities_ir
+        }
+        pagination {
+            type: rowRangesXToYOfZ
+        }
+        performance {
+            lazyLoading: true
+            maxRowsToProcess: 1000000
+        }
+        actionsMenu {
+            controlBreak: false
+            highlight: false
+            compute: false
+            aggregate: false
+            chart: false
+            groupBy: false
+            pivot: false
+            download: false
+        }
+        advanced {
+            savedReportMappingIdentifier: 120408648623534280
+        }
+
+        column ACTIVE_ICON_CLASS (
+            type: hidden
+            heading {
+                heading: Active Icon Class
+            }
+            layout {
+                sequence: 170
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: AE
+            }
+        )
+
+        column ACTIVE_LABEL (
+            type: plainText
+            heading {
+                heading: Status
+                alignment: center
+            }
+            layout {
+                sequence: 160
+                columnAlignment: center
+            }
+            columnFormatting {
+                htmlExpression:
+                    ```html
+                    <button type="button"
+                            class="nat-status-toggle js-toggle-nationality-status"
+                            data-natid="#NATID#"
+                            data-current="#STATUS!ATTR#"
+                            aria-label="Change status for #NATDESC!ATTR#. Current status: #ACTIVE_LABEL!ATTR#"
+                            title="Change status">
+                      <span class="fa #ACTIVE_ICON_CLASS!ATTR#" aria-hidden="true"></span>
+                      <span class="u-VisuallyHidden">#ACTIVE_LABEL!HTML#</span>
+                    </button>
+                    ```
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: AD
+            }
+            enableUsersTo {
+                sort: false
+                filter: false
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column CREATED_BY (
+            type: plainText
+            heading {
+                heading: Created By
+            }
+            layout {
+                sequence: 100
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: W
+            }
+        )
+
+        column CREATION_DATE (
+            type: plainText
+            heading {
+                heading: Creation Date
+            }
+            layout {
+                sequence: 110
+            }
+            appearance {
+                formatMask: DD-MON-YYYY HH24:MI:SS
+            }
+            source {
+                dataType: DATE
+            }
+            advanced {
+                endUserAlias: X
+            }
+        )
+
+        column EDIT_LINK (
+            type: plainText
+            heading {
+                heading: &nbsp;
+                alignment: center
+            }
+            layout {
+                sequence: 10
+                columnAlignment: center
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: AF
+            }
+            enableUsersTo {
+                sort: false
+                filter: false
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+            security {
+                escapeSpecialChars: false
+            }
+        )
+
+        column IS_SYSTEM (
+            type: plainText
+            heading {
+                heading: Is System
+            }
+            layout {
+                sequence: 190
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: AG
+            }
+        )
+
+        column LANG (
+            type: hidden
+            heading {
+                heading: Default Language
+            }
+            layout {
+                sequence: 80
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: U
+            }
+        )
+
+        column LANG_DISPLAY (
+            type: plainText
+            heading {
+                heading: Default Language
+                alignment: center
+            }
+            layout {
+                sequence: 150
+                columnAlignment: center
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: AB
+            }
+        )
+
+        column LAST_UPDATED_BY (
+            type: plainText
+            heading {
+                heading: Last Updated By
+            }
+            layout {
+                sequence: 120
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: Y
+            }
+        )
+
+        column LAST_UPDATE_DATE (
+            type: plainText
+            heading {
+                heading: Last Update Date
+            }
+            layout {
+                sequence: 130
+            }
+            appearance {
+                formatMask: DD-MON-YYYY HH24:MI:SS
+            }
+            source {
+                dataType: DATE
+            }
+            advanced {
+                endUserAlias: Z
+            }
+        )
+
+        column NATDESC (
+            type: plainText
+            heading {
+                heading: Name (EN)
+            }
+            layout {
+                sequence: 30
+            }
+            accessibility {
+                valueIdentifiesRow: true
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: Q
+            }
+        )
+
+        column NATDESC_AR (
+            type: plainText
+            heading {
+                heading: Name (AR)
+                alignment: end
+            }
+            layout {
+                sequence: 40
+                columnAlignment: end
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: R
+            }
+        )
+
+        column NATDESC_SHORT (
+            type: plainText
+            heading {
+                heading: Nationality Code
+            }
+            layout {
+                sequence: 50
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: S
+            }
+        )
+
+        column NATID (
+            type: plainText
+            heading {
+                heading: ID
+                alignment: end
+            }
+            layout {
+                sequence: 20
+                columnAlignment: end
+            }
+            source {
+                primaryKey: true
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: P
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column PAY_VAT (
+            type: hidden
+            heading {
+                heading: VAT Applicable
+            }
+            layout {
+                sequence: 70
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: T
+            }
+        )
+
+        column PAY_VAT_DISPLAY (
+            type: plainText
+            heading {
+                heading: VAT Applicable
+                alignment: center
+            }
+            layout {
+                sequence: 140
+                columnAlignment: center
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: AA
+            }
+        )
+
+        column SORT_ORDER (
+            type: plainText
+            heading {
+                heading: Sort Order
+                alignment: end
+            }
+            layout {
+                sequence: 60
+                columnAlignment: end
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: M
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column STATUS (
+            type: hidden
+            heading {
+                heading: Status
+            }
+            layout {
+                sequence: 90
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: V
+            }
+        )
+
+        savedReport 77328 (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 50
+            }
+        )
+
+    )
+
+    button create (
+        buttonName: CREATE
+        label: Create
+        layout {
+            sequence: 10
+            region: @breadcrumb
+            slot: CREATE
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: redirectThisApp
+            target: {
+                page: 25
+                clearCache: 25
+            }
+            warnOnUnsavedChanges: doNotCheck
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression: fnd_app_security.has_permission('NAT_MANAGE') = 'TRUE'
+        }
+    )
+
+    dynamicAction refresh-after-creation (
+        name: Refresh after Creation
+        execution {
+            sequence: 10
+        }
+        when {
+            event: apexafterclosedialog
+            selectionType: button
+            button: @create
+        }
+
+        action native-refresh (
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @nationalities-report
+            }
+            execution {
+                sequence: 10
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    dynamicAction refresh-after-edit (
+        name: Refresh after Edit
+        execution {
+            sequence: 30
+        }
+        when {
+            event: apexafterclosedialog
+            selectionType: region
+            region: @nationalities-report
+        }
+
+        action native-refresh (
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @nationalities-report
+            }
+            execution {
+                sequence: 10
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    dynamicAction toggle-nationality-status (
+        name: Toggle Nationality Status
+        execution {
+            sequence: 20
+            eventScope: dynamic
+            staticContainer: #nationalities_ir
+        }
+        when {
+            event: click
+            selectionType: jQuerySelector
+            jquerySelector: button.js-toggle-nationality-status
+        }
+
+        action native-confirm (
+            action: confirm
+            settings {
+                message: Are you sure you want to change this nationality status?
+                style: information
+            }
+            execution {
+                sequence: 10
+                fireOnInit: false
+            }
+        )
+
+        action native-javascript-code (
+            action: executeJsCode
+            settings {
+                jsCode:
+                    ```javascript-browser
+                    var el = apex.jQuery(this.triggeringElement).closest(".js-toggle-nationality-status")[0];
+                    var natid = el ? el.getAttribute("data-natid") : null;
+                    var currentStatus = el ? el.getAttribute("data-current") : null;
+                    
+                    if (!natid) {
+                      apex.message.alert("Invalid nationality row.");
+                      return;
+                    }
+                    
+                    el.disabled = true;
+                    
+                    apex.server.process(
+                      "TOGGLE_NATIONALITY_STATUS",
+                      {
+                        x01: natid,
+                        x02: currentStatus
+                      },
+                      {
+                        dataType: "json",
+                        loadingIndicator: apex.jQuery(el),
+                    
+                        success: function (pData) {
+                          if (pData && pData.success) {
+                            apex.region("nationalities_ir").refresh();
+                            apex.message.showPageSuccess("Nationality status updated.");
+                          } else {
+                            el.disabled = false;
+                            apex.message.alert(
+                              (pData && pData.message) || "Nationality status was not updated."
+                            );
+                          }
+                        },
+                    
+                        error: function (jqXHR, textStatus, errorThrown) {
+                          el.disabled = false;
+                    
+                          console.error(
+                            "TOGGLE_NATIONALITY_STATUS failed:",
+                            textStatus,
+                            errorThrown,
+                            jqXHR && jqXHR.responseText
+                          );
+                    
+                          apex.message.alert("Nationality status was not updated.");
+                        }
+                      }
+                    );
+                    ```
+            }
+            execution {
+                sequence: 20
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    process toggle-nationality-status (
+        name: TOGGLE_NATIONALITY_STATUS
+        type: executeCode
+        source {
+            plsqlCode:
+                ```plsql
+                declare
+                    l_natid      nationality.natid%type;
+                    l_new_status nationality.status%type;
+                begin
+                    if fnd_app_security.has_permission('NAT_MANAGE') <> 'TRUE' then
+                        apex_json.open_object;
+                        apex_json.write('success', false);
+                        apex_json.write('message', 'You do not have permission to change nationalities.');
+                        apex_json.close_object;
+                        return;
+                    end if;
+                
+                    l_natid := to_number(apex_application.g_x01);
+                
+                    update nationality
+                       set status =
+                           case status
+                             when 'ACTIVE' then 'INACTIVE'
+                             when 'INACTIVE' then 'ACTIVE'
+                           end,
+                           last_updated_by  = nvl(v('APP_USER'), user),
+                           last_update_date = sysdate
+                     where natid = l_natid
+                       and status = apex_application.g_x02
+                       and status in ('ACTIVE', 'INACTIVE');
+                
+                
+                    if sql%rowcount = 0 then
+                        apex_json.open_object;
+                        apex_json.write('success', false);
+                        apex_json.write('message', 'Nationality was not found or has an invalid status.');
+                        apex_json.close_object;
+                        return;
+                    end if;
+                
+                    select status
+                      into l_new_status
+                      from nationality
+                     where natid = l_natid;
+                
+                    commit;
+                
+                    apex_json.open_object;
+                    apex_json.write('success', true);
+                    apex_json.write('newStatus', l_new_status);
+                    apex_json.close_object;
+                
+                exception
+                    when value_error then
+                        rollback;
+                
+                        apex_json.open_object;
+                        apex_json.write('success', false);
+                        apex_json.write('message', 'Invalid nationality row.');
+                        apex_json.close_object;
+                
+                    when others then
+                        rollback;
+                
+                        apex_debug.error(
+                            'TOGGLE_NATIONALITY_STATUS failed. NATID=%s, ERROR=%s',
+                            apex_application.g_x01,
+                            sqlerrm
+                        );
+                
+                        apex_json.open_object;
+                        apex_json.write('success', false);
+                        apex_json.write('message', 'Nationality status was not updated.');
+                        apex_json.close_object;
+                end;
+                ```
+        }
+        execution {
+            sequence: 10
+            point: ajaxCallback
+        }
+        advanced {
+            executionMappingIdentifier: 40341030621107604
+        }
+    )
+
+)
+
