@@ -424,7 +424,7 @@ These workflows will need equivalent navigation or integrated functionality in t
 
 ### Forms Report Object
 
-The XML contains one Oracle Forms Report object:
+The form contains one Oracle Forms Report object:
 
 * `XX`
 
@@ -436,10 +436,10 @@ Its relevance to the current invoicing workflow should be verified during migrat
 
 The Form contains active references to several Oracle Reports/JSP outputs, including:
 
-* `inv_small_cash.jsp` — normal invoice output
-* `inv_form2.jsp` — detailed invoice output
-* `PAT_CARD_INV.jsp` — patient/invoice card or barcode output
-* `iqama_check.jsp` — patient/Iqama-related output
+* `inv_small_cash.jsp` - normal invoice output
+* `inv_form2.jsp` - detailed invoice output
+* `PAT_CARD_INV.jsp` - patient/invoice card or barcode output
+* `iqama_check.jsp` - patient/Iqama-related output
 
 The invoice print selection can dynamically choose between the normal and detailed invoice formats.
 
