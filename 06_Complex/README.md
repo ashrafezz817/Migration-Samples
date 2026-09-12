@@ -477,7 +477,7 @@ These workflows should generally become normal APEX page navigation or integrate
 
 ### Forms Report Objects
 
-The XML contains **no actual `<Report>` objects**, so the technical-summary `Report Objects` count is `0`.
+The forms contains **no actual `<Report>` objects**, so the technical-summary `Report Objects` count is `0`.
 
 ### Active Report / JSP Dependencies
 
