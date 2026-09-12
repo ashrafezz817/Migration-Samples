@@ -161,7 +161,7 @@ The appropriate design should depend on the functionality of the individual Form
 
 ## Files
 
-* `hmisfox_page_49.apx` — Oracle APEX Page 49 export
-* `backend/BIL_CASHIER_SHIFT.sql` — complete cashier-shift backend package specification and body
-* `screenshots/screenshot-no-open-shift.png` — APEX page when the cashier has no active shift
-* `screenshots/screenshot-open-shift.png` — APEX page when an active cashier shift already exists
+* `hmisfox_page_49.apx` - Oracle APEX Page 49 export
+* `backend/BIL_CASHIER_SHIFT.sql` - complete cashier-shift backend package specification and body
+* `screenshots/screenshot-no-open-shift.png` - APEX page when the cashier has no active shift
+* `screenshots/screenshot-open-shift.png` - APEX page when an active cashier shift already exists
