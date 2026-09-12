@@ -227,20 +227,6 @@ page 53 (
         }
     )
 
-    pageItem P53_LOCATION (
-        type: hidden
-        layout {
-            sequence: 130
-            region: @new
-            slot: regionBody
-        }
-        source {
-            formRegion: @new
-            column: LOCATION
-            dataType: varchar2
-        }
-    )
-
     pageItem P53_NEW_PAT_TIME (
         type: numberField
         label {
@@ -415,34 +401,6 @@ page 53 (
         default {
             type: static
             staticValue: Y
-        }
-    )
-
-    pageItem P53_WATING_ROOM (
-        type: hidden
-        layout {
-            sequence: 140
-            region: @new
-            slot: regionBody
-        }
-        source {
-            formRegion: @new
-            column: WATING_ROOM
-            dataType: varchar2
-        }
-    )
-
-    pageItem P53_WATING_ROOM2 (
-        type: hidden
-        layout {
-            sequence: 150
-            region: @new
-            slot: regionBody
-        }
-        source {
-            formRegion: @new
-            column: WATING_ROOM2
-            dataType: varchar2
         }
     )
 

@@ -109,9 +109,6 @@ page 52 (
                        OLD_PAT_TIME,
                        NEW_PAT_TIME,
                        REVIEW_DATES,
-                       LOCATION,
-                       WATING_ROOM,
-                       WATING_ROOM2,
                        CLINICNAME_AR,
                        AGE_MIN,
                        AGE_MAX,
@@ -484,31 +481,6 @@ page 52 (
             }
         )
 
-        column LOCATION (
-            type: plainText
-            heading {
-                heading: Location
-            }
-            layout {
-                sequence: 140
-            }
-            source {
-                dataType: STRING
-            }
-            advanced {
-                endUserAlias: F
-            }
-            enableUsersTo {
-                highlight: false
-                controlBreak: false
-                aggregate: false
-                compute: false
-                chart: false
-                groupBy: false
-                pivot: false
-            }
-        )
-
         column NEW_PAT_TIME (
             type: plainText
             heading {
@@ -701,56 +673,6 @@ page 52 (
             }
             security {
                 escapeSpecialChars: false
-            }
-        )
-
-        column WATING_ROOM (
-            type: plainText
-            heading {
-                heading: Waiting Room
-            }
-            layout {
-                sequence: 150
-            }
-            source {
-                dataType: STRING
-            }
-            advanced {
-                endUserAlias: G
-            }
-            enableUsersTo {
-                highlight: false
-                controlBreak: false
-                aggregate: false
-                compute: false
-                chart: false
-                groupBy: false
-                pivot: false
-            }
-        )
-
-        column WATING_ROOM2 (
-            type: plainText
-            heading {
-                heading: Secondary Waiting Room
-            }
-            layout {
-                sequence: 160
-            }
-            source {
-                dataType: STRING
-            }
-            advanced {
-                endUserAlias: H
-            }
-            enableUsersTo {
-                highlight: false
-                controlBreak: false
-                aggregate: false
-                compute: false
-                chart: false
-                groupBy: false
-                pivot: false
             }
         )
 
