@@ -109,7 +109,7 @@ The legacy `PRE-INSERT` logic generates `CLINICID` using a `MAX(CLINICID) + 1` p
 
 ### Database Packages
 
-No direct Oracle database package dependencies were identified in the Form.
+No direct Oracle database package dependencies in the Form.
 
 ### Database Functions / Procedures
 
