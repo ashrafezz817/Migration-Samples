@@ -266,12 +266,6 @@ The Form contains a dedicated OTP view and fields related to mobile verification
 * OTP date
 * Verification status
 
-A **Validate Mobile** action opens the OTP interface.
-
-The XML also contains historical calls to OTP-generation and OTP-validation procedures, but those calls are currently commented out in the current Form version.
-
-The target migration should therefore confirm the intended current mobile-verification workflow rather than assuming all legacy OTP code remains active.
-
 ### Patient Packages and Requested Services
 
 When an existing patient is queried, the Form checks for:
