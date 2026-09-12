@@ -1,0 +1,1725 @@
+page 17 (
+    name: Patients
+    alias: PATIENTS
+    title: Patients
+    pageGroup: @patient-management
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        warnOnUnsavedChanges: false
+    }
+    css {
+        fileUrls: #APP_FILES#empty-state#MIN#.css
+        inline:
+            ```css
+            /* ================= to prevent the flicker on page load ================ */
+            #search-load-state {
+              display: none;
+            }
+            #patient_report {
+              display: none;
+            }
+            /* ================= Patient report action column ================ */
+            .patient-action {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              min-width: 2rem;
+              min-height: 2rem;
+              border-radius: .5rem;
+              text-decoration: none;
+            }
+            
+            .patient-action--insurance-disabled {
+              color: #dc2626;
+              opacity: .55;
+              cursor: not-allowed;
+            }
+            
+            .patient-action--insurance-disabled:hover {
+              opacity: .75;
+            }
+            
+            /* ================= Search loading animation ================ */
+            .patient-search-loading__icon {
+              position: relative;
+              width: 56px;
+              height: 56px;
+              margin: 0 auto 20px;
+              border-radius: 999px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: #FFFFFF;
+              color: #0E6F68;
+              font-size: 19px;
+            }
+            
+            .patient-search-loading__icon::before {
+              content: '';
+              position: absolute;
+              inset: 0;
+              border-radius: 999px;
+              background: conic-gradient(from 0deg, transparent 0%, #0E6F68 12%, transparent 28%);
+              -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #17212B calc(100% - 2px));
+              mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #17212B calc(100% - 2px));
+              animation: patient-search-spin 1.6s linear infinite;
+            }
+            
+            @keyframes patient-search-spin {
+              to { transform: rotate(360deg); }
+            }
+            ```
+    }
+    security {
+        authorizationScheme: @has-permission
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+    }
+    advanced {
+        enableDuplicatePageSubmissions: false
+    }
+
+    region advanced-filters (
+        name: Advanced Filters
+        type: staticContent
+        layout {
+            sequence: 70
+            parentRegion: @find-patient
+            slot: regionBody
+        }
+        appearance {
+            template: @/collapsible
+            templateOptions: [
+                #DEFAULT#
+                js-useLocalStorage
+                is-collapsed
+                t-Region--noBorder
+                t-Region--scrollBody
+                t-Form--slimPadding
+                margin-top-sm
+            ]
+        }
+        advanced {
+            htmlDomId: adv_filters
+        }
+    )
+
+    region breadcrumb (
+        name: breadcrumb
+        type: breadcrumb
+        source {
+            breadcrumb: @breadcrumb
+        }
+        layout {
+            sequence: 40
+            slot: regionBody
+        }
+        appearance {
+            template: @/title-bar
+            templateOptions: [
+                #DEFAULT#
+                t-BreadcrumbRegion--useBreadcrumbTitle
+            ]
+        }
+        componentAppearance {
+            breadcrumbTemplate: @/breadcrumb
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region find-patient (
+        name: Find Patient
+        type: staticContent
+        layout {
+            sequence: 50
+            slot: regionBody
+        }
+        appearance {
+            template: @/standard
+            templateOptions: [
+                #DEFAULT#
+                t-Region--noBorder
+                t-Region--hiddenOverflow
+                t-Form--slimPadding
+                margin-top-none
+            ]
+        }
+    )
+
+    region page-load-empty-state (
+        name: Page Load Empty State
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div class="empty-state empty-state--card empty-state--image-search">
+                  <h3 class="empty-state__title">
+                    Search for a patient
+                  </h3>
+                
+                  <p class="empty-state__text">
+                    Use the search bar or advanced filters above to find a patient.
+                  </p>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 60
+            slot: regionBody
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            htmlDomId: page-load-empty-state
+        }
+    )
+
+    region patient-report (
+        name: Patient Report
+        type: classicReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                with p as (
+                    select
+                        nullif(trim(:P17_SEARCH_TEXT), '')          as search_text,
+                        nullif(trim(:P17_MR_NO), '')                as mr_no,
+                        nullif(trim(:P17_ID_NO), '')                as id_no,
+                        nullif(trim(:P17_PHONE), '')                as phone,
+                        nullif(trim(:P17_INSURANCE_MEMBER_ID), '')  as insurance_member_id,
+                        nullif(trim(:P17_PATIENTNAME), '')          as patientname_en,
+                        nullif(trim(:P17_PATIENTNAME_AR), '')       as patientname_ar
+                    from dual
+                )
+                select
+                    v.patientno,
+                    v.patient_name_en as patientname,
+                    v.file_date,
+                    v.gender_code as gender,
+                    v.id_no,
+                    v.phone_personal,
+                    v.phone_work,
+                    v.coverage_type,
+                    case nvl(v.coverage_type, 'CASH')
+                      when 'INSURANCE' then
+                        '<span class="t-Badge t-Badge--info">Insurance</span>'
+                      when 'DIRECT_CONTRACT' then
+                        '<span class="t-Badge t-Badge--warning">Direct Contract</span>'
+                      else
+                        '<span class="t-Badge">Cash</span>'
+                    end as coverage_type_badge,
+                    v.bdate,
+                    v.ins_number,
+                    v.patient_name_ar,
+                    v.comp_code,
+                    v.last_visit,
+                    case
+                    when fnd_app_security.has_permission('INSURANCE_ELIG_VIEW') <> 'TRUE' then
+                        null
+                
+                    when nvl(v.coverage_type, 'CASH') = 'INSURANCE'
+                    and v.id_no is not null then
+                        '<a href="' ||
+                        apex_escape.html_attribute(
+                        apex_page.get_url(
+                            p_page        => 30,
+                            p_request     => 'AUTO_GET_INSURANCE',
+                            p_clear_cache => '30',
+                            p_items       => 'P30_ID_NO,P30_AUTO_GET_INSURANCE',
+                            p_values      => v.id_no || ',Y'
+                        )
+                        ) ||
+                        '" class="patient-action patient-action--insurance"
+                        title="Retrieve Insurance"
+                        aria-label="Retrieve insurance for patient ' ||
+                        apex_escape.html_attribute(v.patientno) ||
+                        '">' ||
+                          '<span class="fa fa-id-card" aria-hidden="true"></span>' ||
+                        '</a>'
+                
+                      else
+                        '<span class="patient-action patient-action--insurance-disabled"
+                               title="Insurance retrieval is not available for this patient"
+                               aria-label="Insurance retrieval is not available for this patient"
+                               aria-disabled="true">' ||
+                          '<span class="fa fa-id-card" aria-hidden="true"></span>' ||
+                       '</span>'
+                    end as retrieve_insurance_link
+                from v_patient_search v
+                cross join p
+                where
+                    (
+                           p.search_text          is not null
+                        or p.mr_no                is not null
+                        or p.id_no                is not null
+                        or p.phone                is not null
+                        or p.insurance_member_id  is not null
+                        or p.patientname_en       is not null
+                        or p.patientname_ar       is not null
+                    )
+                and (
+                       p.search_text is null
+                    or v.patientno    = p.search_text
+                    or v.id_no        = p.search_text
+                    or v.ins_number   = p.search_text
+                    or (
+                         regexp_like(p.search_text, '^[0-9]+$')
+                         and (
+                                v.phone_personal like '%' || p.search_text || '%'
+                             or v.phone_work     like '%' || p.search_text || '%'
+                         )
+                       )
+                    or (
+                         not regexp_like(p.search_text, '^[0-9]+$')
+                         and length(p.search_text) >= 3
+                         and (
+                                contains(v.patient_name_en, p.search_text, 1) > 0
+                             or contains(v.patient_name_ar, p.search_text, 2) > 0
+                         )
+                       )
+                )
+                and (
+                       p.mr_no is null
+                    or v.patientno = p.mr_no
+                )
+                and (
+                       p.id_no is null
+                    or v.id_no = p.id_no
+                )
+                and (
+                       p.phone is null
+                    or (
+                         length(p.phone) >= 3
+                         and (
+                                v.phone_personal like '%' || p.phone || '%'
+                             or v.phone_work     like '%' || p.phone || '%'
+                         )
+                       )
+                )
+                and (
+                       p.insurance_member_id is null
+                    or v.ins_number = p.insurance_member_id
+                )
+                and (
+                       p.patientname_en is null
+                    or (
+                         length(p.patientname_en) >= 3
+                         and contains(v.patient_name_en, p.patientname_en, 3) > 0
+                       )
+                )
+                and (
+                       p.patientname_ar is null
+                    or (
+                         length(p.patientname_ar) >= 3
+                         and contains(v.patient_name_ar, p.patientname_ar, 4) > 0
+                       )
+                )
+                order by v.patient_name_en;
+                ```
+            pageItemsToSubmit: [
+                P17_SEARCH_TEXT
+                P17_MR_NO
+                P17_ID_NO
+                P17_PHONE
+                P17_INSURANCE_MEMBER_ID
+                P17_PATIENTNAME
+                P17_PATIENTNAME_AR
+            ]
+        }
+        layout {
+            sequence: 80
+            slot: regionBody
+        }
+        appearance {
+            template: @/standard
+            templateOptions: [
+                #DEFAULT#
+                t-Region--noPadding
+                t-Region--hideHeader js-addHiddenHeadingRoleDesc
+                t-Region--noBorder
+                t-Region--hiddenOverflow
+                margin-bottom-none
+            ]
+        }
+        advanced {
+            htmlDomId: patient_report
+        }
+        componentAppearance {
+            template: @/standard
+            templateOptions: [
+                #DEFAULT#
+                t-Report--stretch
+                t-Report--staticRowColors
+                t-Report--rowHighlight
+                t-Report--inline
+                t-Report--hideNoPagination
+            ]
+        }
+        pagination {
+            type: rowRangesXToYOfZWithPagination
+        }
+        messages {
+            whenNoDataFound:
+                ```
+                <div class="empty-state empty-state--region empty-state--image-dune">
+                  <h3 class="empty-state__title">No patients found</h3>
+                  <p class="empty-state__text">
+                    No patients matched your search criteria.
+                  </p>
+                </div>
+                ```
+        }
+
+        column BDATE (
+            reportColumnQueryId: 10
+            derivedColumn: N
+            heading {
+                heading: Birth Date
+            }
+            layout {
+                sequence: 100
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column COMP_CODE (
+            reportColumnQueryId: 13
+            derivedColumn: N
+            type: plainTextBasedOnLov
+            heading {
+                heading: Insurance
+            }
+            lov {
+                type: sharedComponent
+                lov: @main-insurance-companies
+            }
+            layout {
+                sequence: 140
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column COVERAGE_TYPE (
+            reportColumnQueryId: 8
+            derivedColumn: N
+            type: hidden
+            layout {
+                sequence: 180
+            }
+        )
+
+        column COVERAGE_TYPE_BADGE (
+            reportColumnQueryId: 9
+            derivedColumn: N
+            heading {
+                heading: Coverage Type
+                alignment: center
+            }
+            layout {
+                sequence: 190
+                columnAlignment: center
+            }
+            sorting {
+                sortable: false
+            }
+            security {
+                escapeSpecialChars: false
+            }
+        )
+
+        column DERIVED$01 (
+            reportColumnQueryId: 15
+            derivedColumn: Y
+            type: link
+            heading {
+                heading: &nbsp;
+            }
+            layout {
+                sequence: 10
+            }
+            link {
+                target: {
+                    page: 19
+                    items: {
+                        P19_PATIENTNO: #PATIENTNO#
+                    }
+                    clearCache: 19
+                    request: VIEW
+                }
+                linkText: <span class="fa fa-eye" aria-hidden="true"></span>
+                linkAttributes: title="View Patient Demographics" aria-label="View patient demographics for #PATIENTNO#"
+            }
+            sorting {
+                sortable: false
+            }
+            exportPrinting {
+                includeInExportPrint: false
+            }
+            serverSideCondition {
+                type: expression
+                plsqlExpression: fnd_app_security.has_permission('PATIENT_DEMOG_VIEW') = 'TRUE'
+            }
+        )
+
+        column DERIVED$02 (
+            reportColumnQueryId: 18
+            derivedColumn: Y
+            type: link
+            heading {
+                heading: &nbsp;
+                alignment: center
+            }
+            layout {
+                sequence: 20
+                columnAlignment: center
+            }
+            link {
+                target: {
+                    page: 56
+                    items: {
+                        P56_PATIENTNO: #PATIENTNO#
+                    }
+                    clearCache: 56
+                }
+                linkText: <span class="fa fa-bed-pulse" aria-hidden="true"></span>
+                linkAttributes: title="New Visit Invoice" aria-label="Create new visit invoice for patient #PATIENTNO#"
+            }
+            sorting {
+                sortable: false
+            }
+            exportPrinting {
+                includeInExportPrint: false
+            }
+            serverSideCondition {
+                type: expression
+                plsqlExpression: fnd_app_security.has_permission('BILLING_PATIENT_NEW_VISIT_INVOICE_CREATE') = 'TRUE'
+            }
+        )
+
+        column DERIVED$03 (
+            reportColumnQueryId: 19
+            derivedColumn: Y
+            type: link
+            heading {
+                heading: &nbsp;
+                alignment: center
+            }
+            layout {
+                sequence: 40
+                columnAlignment: center
+            }
+            link {
+                target: {
+                    page: 48
+                    items: {
+                        P48_MODE: CREATE
+                        P48_PATIENTNO: #PATIENTNO#
+                    }
+                    clearCache: 48
+                }
+                linkText: <span class="fa fa-file-text" aria-hidden="true"></span>
+                linkAttributes: title="Create invoice" aria-label="Create invoice for patient #PATIENTNO#"
+            }
+            sorting {
+                sortable: false
+            }
+            exportPrinting {
+                includeInExportPrint: false
+            }
+            serverSideCondition {
+                type: expression
+                plsqlExpression: fnd_app_security.has_permission('BILLING_PATIENT_INVOICES_CREATE') = 'TRUE'
+            }
+        )
+
+        column DERIVED$04 (
+            reportColumnQueryId: 19
+            derivedColumn: Y
+            type: link
+            heading {
+                heading: &nbsp;
+                alignment: center
+            }
+            layout {
+                sequence: 30
+                columnAlignment: center
+            }
+            link {
+                target: {
+                    page: 57
+                    items: {
+                        P57_PATIENTNO: #PATIENTNO#
+                    }
+                    clearCache: 57
+                }
+                linkText: <span class="fa fa-clipboard-list" aria-hidden="true"></span>
+                linkAttributes: title="Create service request invoice" aria-label="Create service request invoice for patient #PATIENTNO#"
+            }
+            sorting {
+                sortable: false
+            }
+            exportPrinting {
+                includeInExportPrint: false
+            }
+            serverSideCondition {
+                type: expression
+                plsqlExpression: fnd_app_security.has_permission('BILLING_PATIENT_SERVICE_REQUEST_INVOICE_CREATE') = 'TRUE'
+            }
+        )
+
+        column FILE_DATE (
+            reportColumnQueryId: 3
+            derivedColumn: N
+            heading {
+                heading: Creation Date
+            }
+            layout {
+                sequence: 170
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column GENDER (
+            reportColumnQueryId: 4
+            derivedColumn: N
+            type: plainTextBasedOnLov
+            heading {
+                heading: Gender
+            }
+            lov {
+                type: sharedComponent
+                lov: @gender
+            }
+            layout {
+                sequence: 110
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column ID_NO (
+            reportColumnQueryId: 5
+            derivedColumn: N
+            heading {
+                heading: ID/Iqama
+            }
+            layout {
+                sequence: 70
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column INS_NUMBER (
+            reportColumnQueryId: 11
+            derivedColumn: N
+            heading {
+                heading: Insurance Member ID
+            }
+            layout {
+                sequence: 150
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column LAST_VISIT (
+            reportColumnQueryId: 14
+            derivedColumn: N
+            heading {
+                heading: Last Visit
+            }
+            layout {
+                sequence: 160
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column PATIENTNAME (
+            reportColumnQueryId: 2
+            derivedColumn: N
+            heading {
+                heading: Patient Name (EN)
+            }
+            layout {
+                sequence: 80
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column PATIENTNO (
+            reportColumnQueryId: 1
+            derivedColumn: N
+            heading {
+                heading: MRN
+            }
+            layout {
+                sequence: 60
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column PATIENT_NAME_AR (
+            reportColumnQueryId: 12
+            derivedColumn: N
+            heading {
+                heading: Patient Name (AR)
+                alignment: end
+            }
+            layout {
+                sequence: 90
+                columnAlignment: end
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column PHONE_PERSONAL (
+            reportColumnQueryId: 6
+            derivedColumn: N
+            heading {
+                heading: Personal Phone
+            }
+            layout {
+                sequence: 120
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column PHONE_WORK (
+            reportColumnQueryId: 7
+            derivedColumn: N
+            heading {
+                heading: Work Phone
+            }
+            layout {
+                sequence: 130
+            }
+            sorting {
+                sortable: false
+            }
+        )
+
+        column RETRIEVE_INSURANCE_LINK (
+            reportColumnQueryId: 15
+            derivedColumn: N
+            heading {
+                heading: &nbsp
+                alignment: center
+            }
+            layout {
+                sequence: 50
+                columnAlignment: center
+            }
+            sorting {
+                sortable: false
+            }
+            exportPrinting {
+                includeInExportPrint: false
+            }
+            security {
+                escapeSpecialChars: false
+            }
+        )
+
+    )
+
+    region patients (
+        name: Patients
+        type: staticContent
+        layout {
+            sequence: 20
+            slot: regionBody
+        }
+        appearance {
+            template: @/title-bar
+            templateOptions: [
+                #DEFAULT#
+                t-BreadcrumbRegion--useRegionTitle
+            ]
+        }
+    )
+
+    region search-load-state (
+        name: Search Load State
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div class="empty-state empty-state--card">
+                  <div class="patient-search-loading__icon" aria-hidden="true">
+                    <span class="fa fa-search"></span>
+                  </div>
+                  <div class="empty-state__title">
+                    Searching patients
+                  </div>
+                  <div class="empty-state__text">
+                    Please wait while we look for matching patient records.
+                  </div>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 70
+            slot: regionBody
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        advanced {
+            htmlDomId: search-load-state
+        }
+    )
+
+    pageItem P17_ID_NO (
+        type: numberField
+        label {
+            label: ID/Iqama
+            alignment: left
+        }
+        layout {
+            sequence: 20
+            region: @advanced-filters
+            slot: regionBody
+            alignment: left
+            startNewRow: false
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        sessionState {
+            storage: request
+        }
+        security {
+            encryptSessionState: false
+        }
+    )
+
+    pageItem P17_INSURANCE_MEMBER_ID (
+        type: textField
+        label {
+            label: Insurance Member ID
+            alignment: left
+        }
+        layout {
+            sequence: 50
+            region: @advanced-filters
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        sessionState {
+            storage: request
+        }
+        security {
+            encryptSessionState: false
+        }
+    )
+
+    pageItem P17_MR_NO (
+        type: textField
+        label {
+            label: MRN
+            alignment: left
+        }
+        layout {
+            sequence: 10
+            region: @advanced-filters
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        sessionState {
+            storage: request
+        }
+        security {
+            encryptSessionState: false
+        }
+    )
+
+    pageItem P17_PATIENTNAME (
+        type: textField
+        label {
+            label: Patient Name (EN)
+            alignment: left
+        }
+        layout {
+            sequence: 70
+            region: @advanced-filters
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        advanced {
+            cssClasses: en
+        }
+        sessionState {
+            storage: request
+        }
+        security {
+            encryptSessionState: false
+        }
+    )
+
+    pageItem P17_PATIENTNAME_AR (
+        type: textField
+        label {
+            label: Patient Name (AR)
+            alignment: left
+        }
+        layout {
+            sequence: 80
+            region: @advanced-filters
+            slot: regionBody
+            alignment: left
+            startNewRow: false
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        advanced {
+            cssClasses: ar
+        }
+        sessionState {
+            storage: request
+        }
+        security {
+            encryptSessionState: false
+        }
+    )
+
+    pageItem P17_PHONE (
+        type: textField
+        label {
+            label: Phone
+            alignment: left
+        }
+        settings {
+            subtype: phone
+        }
+        layout {
+            sequence: 30
+            region: @advanced-filters
+            slot: regionBody
+            alignment: left
+            startNewRow: false
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+            valuePlaceholder: Personal or Work
+        }
+        sessionState {
+            storage: request
+        }
+        security {
+            encryptSessionState: false
+        }
+    )
+
+    pageItem P17_SEARCH_TEXT (
+        type: textField
+        label {
+            alignment: left
+        }
+        layout {
+            sequence: 40
+            region: @find-patient
+            slot: regionBody
+            alignment: left
+            columnSpan: 5
+            labelColumnSpan: 0
+        }
+        appearance {
+            template: @/hidden
+            templateOptions: [
+                #DEFAULT#
+                t-Form-fieldContainer--stretchInputs
+                t-Form-fieldContainer--xlarge
+                margin-top-none
+            ]
+            icon: fa-solid fa-magnifying-glass
+            width: 30
+            valuePlaceholder: Search by MRN, ID/Iqama, phone, insurance member ID, or patient name
+        }
+        sessionState {
+            storage: request
+        }
+        security {
+            encryptSessionState: false
+        }
+    )
+
+    button clear (
+        buttonName: CLEAR
+        label: Clear
+        layout {
+            sequence: 10
+            region: @find-patient
+            slot: CLOSE
+        }
+        appearance {
+            buttonTemplate: @/text
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: definedByDynamicAction
+            executeValidations: false
+        }
+    )
+
+    button create (
+        buttonName: CREATE
+        label: Create
+        layout {
+            sequence: 10
+            region: @breadcrumb
+            slot: CREATE
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: redirectThisApp
+            target: {
+                page: 19
+                clearCache: 19
+                request: CREATE
+            }
+            warnOnUnsavedChanges: doNotCheck
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression: fnd_app_security.has_permission('PATIENT_CREATE') = 'TRUE'
+        }
+    )
+
+    button search (
+        buttonName: SEARCH
+        label: Search
+        layout {
+            sequence: 50
+            region: @find-patient
+            slot: CREATE
+        }
+        appearance {
+            buttonTemplate: @/text-with-icon
+            hot: true
+            templateOptions: [
+                #DEFAULT#
+                t-Button--iconLeft
+                t-Button--padTop
+            ]
+        }
+        behavior {
+            action: definedByDynamicAction
+        }
+        advanced {
+            htmlDomId: btn_search
+        }
+    )
+
+    dynamicAction clear-search (
+        name: Clear Search
+        execution {
+            sequence: 40
+        }
+        when {
+            event: click
+            selectionType: button
+            button: @clear
+        }
+
+        action native-clear (
+            action: clear
+            affectedElements {
+                selectionType: items
+                items: [
+                    P17_SEARCH_TEXT
+                    P17_MR_NO
+                    P17_ID_NO
+                    P17_PHONE
+                    P17_INSURANCE_MEMBER_ID
+                    P17_PATIENTNAME
+                    P17_PATIENTNAME_AR
+                ]
+            }
+            execution {
+                sequence: 10
+                fireOnInit: false
+            }
+        )
+
+        action native-hide (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 30
+                fireOnInit: false
+            }
+        )
+
+        action native-javascript-code (
+            action: executeJsCode
+            settings {
+                jsCode:
+                    ```javascript-browser
+                    const btn = document.querySelector("#adv_filters .t-Region-header button");
+                    if (btn && btn.getAttribute("aria-expanded") === "true") {
+                      btn.click();
+                    }
+                    ```
+            }
+            execution {
+                sequence: 50
+                fireOnInit: false
+            }
+        )
+
+        action native-refresh (
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 40
+                fireOnInit: false
+            }
+        )
+
+        action native-set-focus (
+            action: setFocus
+            affectedElements {
+                selectionType: items
+                items: P17_SEARCH_TEXT
+            }
+            execution {
+                sequence: 60
+                fireOnInit: false
+            }
+        )
+
+        action native-show (
+            action: show
+            affectedElements {
+                selectionType: region
+                region: @page-load-empty-state
+            }
+            execution {
+                sequence: 20
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    dynamicAction empty-search-click (
+        name: Empty Search Click
+        execution {
+            sequence: 80
+        }
+        when {
+            event: click
+            selectionType: button
+            button: @search
+        }
+        clientSideCondition {
+            type: jsExpression
+            javaScriptExpression:
+                ```javascript-browser
+                !(
+                  $v("P17_SEARCH_TEXT") ||
+                  $v("P17_MR_NO") ||
+                  $v("P17_ID_NO") ||
+                  $v("P17_PHONE") ||
+                  $v("P17_INSURANCE_MEMBER_ID") ||
+                  $v("P17_PATIENTNAME") ||
+                  $v("P17_PATIENTNAME_AR")
+                )
+                ```
+        }
+
+        action native-hide (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @search-load-state
+            }
+            execution {
+                sequence: 10
+                fireOnInit: false
+            }
+        )
+
+        action native-hide_1 (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 20
+                fireOnInit: false
+            }
+        )
+
+        action native-set-focus (
+            action: setFocus
+            affectedElements {
+                selectionType: items
+                items: P17_SEARCH_TEXT
+            }
+            execution {
+                sequence: 40
+                fireOnInit: false
+            }
+        )
+
+        action native-show (
+            action: show
+            affectedElements {
+                selectionType: region
+                region: @page-load-empty-state
+            }
+            execution {
+                sequence: 30
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    dynamicAction enter-search (
+        name: Enter Search
+        execution {
+            sequence: 30
+        }
+        when {
+            event: keypress
+            selectionType: items
+            items: [
+                P17_SEARCH_TEXT
+                P17_MR_NO
+                P17_ID_NO
+                P17_INSURANCE_MEMBER_ID
+                P17_PATIENTNAME
+                P17_PATIENTNAME_AR
+                P17_PHONE
+            ]
+        }
+        clientSideCondition {
+            type: jsExpression
+            javaScriptExpression: this.browserEvent.key === "Enter"
+        }
+
+        action native-refresh (
+            action: executeJsCode
+            settings {
+                jsCode:
+                    ```javascript-browser
+                    this.browserEvent.preventDefault();
+                    
+                    var btn = document.getElementById("btn_search");
+                    
+                    if (btn) {
+                      btn.click();
+                    }
+                    ```
+            }
+            execution {
+                sequence: 20
+                fireOnInit: false
+            }
+            clientSideCondition {
+                type: jsExpression
+                javaScriptExpression:
+                    ```javascript-browser
+                    $v("P17_SEARCH_TEXT") ||
+                    $v("P17_MR_NO") ||
+                    $v("P17_ID_NO") ||
+                    $v("P17_PHONE") ||
+                    $v("P17_INSURANCE_MEMBER_ID") ||
+                    $v("P17_PATIENTNAME") ||
+                    $v("P17_PATIENTNAME_AR")
+                    ```
+            }
+        )
+
+    )
+
+    dynamicAction filters-cleared (
+        name: Filters Cleared
+        execution {
+            sequence: 60
+        }
+        when {
+            selectionType: items
+            items: [
+                P17_SEARCH_TEXT
+                P17_MR_NO
+                P17_ID_NO
+                P17_PHONE
+                P17_INSURANCE_MEMBER_ID
+                P17_PATIENTNAME
+                P17_PATIENTNAME_AR
+            ]
+        }
+        clientSideCondition {
+            type: jsExpression
+            javaScriptExpression:
+                ```javascript-browser
+                !(
+                  $v("P17_SEARCH_TEXT") ||
+                  $v("P17_MR_NO") ||
+                  $v("P17_ID_NO") ||
+                  $v("P17_PHONE") ||
+                  $v("P17_INSURANCE_MEMBER_ID") ||
+                  $v("P17_PATIENTNAME") ||
+                  $v("P17_PATIENTNAME_AR")
+                )
+                ```
+        }
+
+        action native-hide (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 20
+            }
+        )
+
+        action native-refresh (
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 30
+                fireOnInit: false
+            }
+        )
+
+        action native-show (
+            action: show
+            affectedElements {
+                selectionType: region
+                region: @page-load-empty-state
+            }
+            execution {
+                sequence: 10
+            }
+        )
+
+    )
+
+    dynamicAction init-search-state (
+        name: Init Search State
+        execution {
+            sequence: 50
+        }
+        when {
+            event: ready
+        }
+        clientSideCondition {
+            type: jsExpression
+            javaScriptExpression:
+                ```javascript-browser
+                !(
+                  $v("P17_SEARCH_TEXT") ||
+                  $v("P17_MR_NO") ||
+                  $v("P17_ID_NO") ||
+                  $v("P17_PHONE") ||
+                  $v("P17_INSURANCE_MEMBER_ID") ||
+                  $v("P17_PATIENTNAME") ||
+                  $v("P17_PATIENTNAME_AR")
+                )
+                ```
+        }
+
+        action native-hide (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 10
+            }
+        )
+
+        action native-hide-2 (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @page-load-empty-state
+            }
+            execution {
+                sequence: 20
+                fireWhenEventResultIs: false
+            }
+        )
+
+        action native-hide_1 (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @search-load-state
+            }
+            execution {
+                sequence: 20
+            }
+        )
+
+        action native-hide_2 (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @search-load-state
+            }
+            execution {
+                sequence: 30
+                fireWhenEventResultIs: false
+            }
+        )
+
+        action native-show (
+            action: show
+            affectedElements {
+                selectionType: region
+                region: @page-load-empty-state
+            }
+            execution {
+                sequence: 30
+            }
+        )
+
+        action native-show-2 (
+            action: show
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 40
+                fireWhenEventResultIs: false
+            }
+        )
+
+    )
+
+    dynamicAction patient-report-refreshed (
+        name: Patient Report Refreshed
+        execution {
+            sequence: 70
+        }
+        when {
+            event: apexafterrefresh
+            selectionType: region
+            region: @patient-report
+        }
+        clientSideCondition {
+            type: jsExpression
+            javaScriptExpression: window.p17PatientSearchRunning === true
+        }
+
+        action native-hide (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @search-load-state
+            }
+            execution {
+                sequence: 10
+            }
+        )
+
+        action native-javascript-code (
+            action: executeJsCode
+            settings {
+                jsCode: window.p17PatientSearchRunning = false;
+            }
+            execution {
+                sequence: 30
+                fireOnInit: false
+            }
+        )
+
+        action native-show (
+            action: show
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 20
+            }
+        )
+
+    )
+
+    dynamicAction search (
+        name: "Search "
+        execution {
+            sequence: 10
+            eventScope: dynamic
+        }
+        when {
+            event: click
+            selectionType: button
+            button: @search
+        }
+
+        action native-hide (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @page-load-empty-state
+            }
+            execution {
+                sequence: 20
+                fireOnInit: false
+            }
+            clientSideCondition {
+                type: jsExpression
+                javaScriptExpression:
+                    ```javascript-browser
+                    $v("P17_SEARCH_TEXT") ||
+                    $v("P17_MR_NO") ||
+                    $v("P17_ID_NO") ||
+                    $v("P17_PHONE") ||
+                    $v("P17_INSURANCE_MEMBER_ID") ||
+                    $v("P17_PATIENTNAME") ||
+                    $v("P17_PATIENTNAME_AR")
+                    ```
+            }
+        )
+
+        action native-hide_1 (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 30
+                fireOnInit: false
+            }
+            clientSideCondition {
+                type: jsExpression
+                javaScriptExpression:
+                    ```javascript-browser
+                    $v("P17_SEARCH_TEXT") ||
+                    $v("P17_MR_NO") ||
+                    $v("P17_ID_NO") ||
+                    $v("P17_PHONE") ||
+                    $v("P17_INSURANCE_MEMBER_ID") ||
+                    $v("P17_PATIENTNAME") ||
+                    $v("P17_PATIENTNAME_AR")
+                    ```
+            }
+        )
+
+        action native-javascript-code (
+            action: executeJsCode
+            settings {
+                jsCode: window.p17PatientSearchRunning = true;
+            }
+            execution {
+                sequence: 50
+                fireOnInit: false
+            }
+            clientSideCondition {
+                type: jsExpression
+                javaScriptExpression:
+                    ```javascript-browser
+                    $v("P17_SEARCH_TEXT") ||
+                    $v("P17_MR_NO") ||
+                    $v("P17_ID_NO") ||
+                    $v("P17_PHONE") ||
+                    $v("P17_INSURANCE_MEMBER_ID") ||
+                    $v("P17_PATIENTNAME") ||
+                    $v("P17_PATIENTNAME_AR")
+                    ```
+            }
+        )
+
+        action native-refresh (
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 60
+                fireOnInit: false
+            }
+            clientSideCondition {
+                type: jsExpression
+                javaScriptExpression:
+                    ```javascript-browser
+                    $v("P17_SEARCH_TEXT") ||
+                    $v("P17_MR_NO") ||
+                    $v("P17_ID_NO") ||
+                    $v("P17_PHONE") ||
+                    $v("P17_INSURANCE_MEMBER_ID") ||
+                    $v("P17_PATIENTNAME") ||
+                    $v("P17_PATIENTNAME_AR")
+                    ```
+            }
+        )
+
+        action native-show (
+            action: show
+            affectedElements {
+                selectionType: region
+                region: @search-load-state
+            }
+            execution {
+                sequence: 40
+                fireOnInit: false
+            }
+            clientSideCondition {
+                type: jsExpression
+                javaScriptExpression:
+                    ```javascript-browser
+                    $v("P17_SEARCH_TEXT") ||
+                    $v("P17_MR_NO") ||
+                    $v("P17_ID_NO") ||
+                    $v("P17_PHONE") ||
+                    $v("P17_INSURANCE_MEMBER_ID") ||
+                    $v("P17_PATIENTNAME") ||
+                    $v("P17_PATIENTNAME_AR")
+                    ```
+            }
+        )
+
+    )
+
+    dynamicAction search-text-cleared (
+        name: Search Text Cleared
+        execution {
+            sequence: 90
+        }
+        when {
+            event: keyup
+            selectionType: items
+            items: P17_SEARCH_TEXT
+        }
+        clientSideCondition {
+            type: jsExpression
+            javaScriptExpression:
+                ```javascript-browser
+                !(
+                  $v("P17_SEARCH_TEXT") ||
+                  $v("P17_MR_NO") ||
+                  $v("P17_ID_NO") ||
+                  $v("P17_PHONE") ||
+                  $v("P17_INSURANCE_MEMBER_ID") ||
+                  $v("P17_PATIENTNAME") ||
+                  $v("P17_PATIENTNAME_AR")
+                )
+                ```
+        }
+
+        action native-hide (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @search-load-state
+            }
+            execution {
+                sequence: 10
+            }
+        )
+
+        action native-hide_1 (
+            action: hide
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 20
+            }
+        )
+
+        action native-refresh (
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @patient-report
+            }
+            execution {
+                sequence: 40
+                fireOnInit: false
+            }
+        )
+
+        action native-show (
+            action: show
+            affectedElements {
+                selectionType: region
+                region: @page-load-empty-state
+            }
+            execution {
+                sequence: 30
+            }
+        )
+
+    )
+
+)
+
