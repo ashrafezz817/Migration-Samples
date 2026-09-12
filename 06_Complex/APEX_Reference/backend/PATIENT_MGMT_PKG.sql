@@ -1,4 +1,6 @@
-create or replace package           "PATIENT_MGMT_PKG" authid definer is
+-- migration reference extract.
+
+create or replace package           PATIENT_MGMT_PKG authid definer is
 
 
   subtype t_patientno is patient.patientno%type;
