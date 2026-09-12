@@ -23,7 +23,7 @@ The backend package contains the reusable business logic and transactional opera
 
 ## APEX Page
 
-### Page 49 — Start Cashier Shift
+### Page 49 - Start Cashier Shift
 
 Page 49 is implemented as a modal dialog.
 
