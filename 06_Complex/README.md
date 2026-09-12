@@ -72,8 +72,8 @@ The Form combines:
 
 The Form contains:
 
-* `PATIENT` — primary database block
-* `STK_V_TOOL` — non-database utility, action, and navigation block
+* `PATIENT` - primary database block
+* `STK_V_TOOL` - non-database utility, action, and navigation block
 
 The `PATIENT` block contains 117 items.
 
