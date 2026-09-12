@@ -329,7 +329,7 @@ A significant amount of this UI behavior is implemented through the `DO_INTERFAC
 
 ## Program Units
 
-The XML contains 20 Program Unit objects:
+The form contains 20 Program Unit objects:
 
 * `MESSAG`
 * `CHG_PRMPT2`
