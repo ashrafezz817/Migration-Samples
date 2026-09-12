@@ -578,7 +578,7 @@ Key considerations include:
 
 ## Files
 
-* `Patient.fmb` — Original Oracle Forms module
-* `Patient.xml` — XML export for source inspection and analysis
-* `screenshot.png` — Screenshot of the current Oracle Forms user interface
+* `Patient.fmb` - Original Oracle Forms module
+* `Patient.xml` - XML export for source inspection and analysis
+* `screenshot.png` - Screenshot of the current Oracle Forms user interface
 
