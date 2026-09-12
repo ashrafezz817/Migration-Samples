@@ -1,4 +1,4 @@
-# APEX Reference — Cashier Shift Open
+# APEX Reference - Cashier Shift Open
 
 ## Purpose
 
