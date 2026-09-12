@@ -1,13 +1,5 @@
 create or replace package bil_offers_admin authid definer as
 
-  ------------------------------------------------------------------------------
-  -- Page 66 standard-offer administration API.
-  --
-  -- This package intentionally does not expose OFFER_TYPE. All public operations
-  -- are scoped to standard offers (OFFERS.OFFER_TYPE = 1) owned by the current
-  -- APEX info center session item G_INFO_CENTER_ID.
-  ------------------------------------------------------------------------------
-
   procedure create_offer(
       p_offer_name             in  offers.offer_name%type,
       p_start_date             in  offers.start_date%type,
@@ -32,10 +24,6 @@ create or replace package bil_offers_admin authid definer as
       p_delete_reason          in offers.delete_reason%type,
       p_expected_ovn           in offers.object_version_number%type
   );
-
-  ------------------------------------------------------------------------------
-  -- Page 62 standard-offer service line administration API.
-  ------------------------------------------------------------------------------
 
   procedure get_offer_service_pricing(
       p_offer_id       in  offers.oferid%type,
@@ -76,21 +64,6 @@ create or replace package bil_offers_admin authid definer as
       o_restored_count  out pls_integer
   );
 
-  ------------------------------------------------------------------------------
-  -- Bundled Offer header administration API.
-  --
-  -- Bundled Offers are enforced internally as OFFERS.OFFER_TYPE = 0. The caller
-  -- never supplies OFFER_TYPE, LIST_ID, information center, original pricing,
-  -- header totals, WITH_VAT, or SERVICEID.
-  --
-  -- VALID_DAYES is required metadata for later entitlement behavior, but these
-  -- APIs do not perform entitlement activation, expiry calculation, invoice
-  -- import, or clinical validation. Header totals are server-derived,
-  -- VAT-exclusive, and recalculated from active components only.
-  --
-  -- No procedure in this package commits or rolls back.
-  ------------------------------------------------------------------------------
-
   procedure create_bundled_offer(
       p_offer_name              in  offers.offer_name%type,
       p_start_date              in  offers.start_date%type,
@@ -117,18 +90,6 @@ create or replace package bil_offers_admin authid definer as
       p_delete_reason           in offers.delete_reason%type,
       p_expected_ovn            in offers.object_version_number%type
   );
-
-  ------------------------------------------------------------------------------
-  -- Bundled Offer component administration API.
-  --
-  -- Components are individually managed in OFFERS_DTL. QTY is required and must
-  -- be an integer from 1 through 999. OFFER_PRICE is the required Bundled Offer
-  -- unit price and may be zero, but must not exceed the authoritative original
-  -- unit price. ORG_PRICE and ORG_DISC are captured from the authoritative cash
-  -- plan; ORG_DISC is reference-only and is not applied to the Bundled Offer
-  -- administrative totals. OFFER_DIS is not used by this contract and is stored
-  -- as NULL by component add/restore/update operations.
-  ------------------------------------------------------------------------------
 
   procedure get_bundle_component_pricing(
       p_offer_id       in  offers.oferid%type,
