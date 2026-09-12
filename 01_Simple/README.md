@@ -81,7 +81,7 @@ No direct Oracle database package dependencies were identified in the legacy For
 
 ### LOVs
 
-* `LOV577` — retrieves user information from `USERS_TABLE`
+* `LOV577` - retrieves user information from `USERS_TABLE`
 
 ### Other Forms
 
@@ -107,7 +107,7 @@ This sample has already been successfully migrated to Oracle APEX.
 
 The completed reference implementation is available under `APEX_Reference/` and includes:
 
-* Oracle APEX Page 49 — **Start Cashier Shift**
+* Oracle APEX Page 49 - **Start Cashier Shift**
 * The shared `BIL_CASHIER_SHIFT` backend package
 * Screenshots showing the page with and without an active cashier shift
 * A dedicated README describing the migrated architecture and modernization approach
@@ -129,7 +129,7 @@ See [`APEX_Reference/README.md`](APEX_Reference/README.md) for details of the mi
 
 ## Files
 
-* `Cashier_Shifts_Open.fmb` — Original Oracle Forms module
-* `Cashier_Shifts_Open.xml` — XML export for source inspection and analysis
-* `screenshot.png` — Screenshot of the current Oracle Forms user interface
-* `APEX_Reference/` — Completed Oracle APEX reference implementation, backend package, screenshots, and migration notes
+* `Cashier_Shifts_Open.fmb` - Original Oracle Forms module
+* `Cashier_Shifts_Open.xml` - XML export for source inspection and analysis
+* `screenshot.png` - Screenshot of the current Oracle Forms user interface
+* `APEX_Reference/` - Completed Oracle APEX reference implementation, backend package, screenshots, and migration notes
