@@ -14,8 +14,8 @@ The required business behavior should be preserved while avoiding unnecessary re
 
 The legacy cashier-shift Form was migrated to:
 
-* **Oracle APEX Page 49 — Start Cashier Shift**
-* **`BIL_CASHIER_SHIFT`** — reusable backend API for cashier-shift operations
+* **Oracle APEX Page 49 - Start Cashier Shift**
+* **`BIL_CASHIER_SHIFT`** - reusable backend API for cashier-shift operations
 
 The APEX page handles the user interaction and presentation of the start-shift workflow.
 
