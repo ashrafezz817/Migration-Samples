@@ -156,7 +156,7 @@ The exact legacy navigation relationship should be reviewed during migration bec
 
 ### Reports
 
-No report objects or report execution dependencies were identified.
+No report objects or report execution dependencies.
 
 ### Shared Forms Libraries
 
