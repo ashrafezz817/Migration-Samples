@@ -33,6 +33,8 @@ This Form represents a relatively straightforward transactional workflow with on
 | DB Packages    |     0 |
 | Report Objects |     0 |
 
+These counts describe the legacy Oracle Forms module only. The migrated APEX reference implementation and its backend components are documented separately under `APEX_Reference/`.
+
 The Form contains one primary database block, `CASHIER_SHIFT`, and one non-database utility block, `TOOLS`.
 
 ## Main Database Objects
@@ -71,11 +73,11 @@ The legacy implementation generates the shift reference using a `MAX(...) + 1` p
 * Shared Forms Object Library dependencies
 * No master-detail relationship
 
-## Dependencies
+## Legacy Dependencies
 
 ### Database Packages
 
-No direct Oracle database package dependencies were identified in the Form.
+No direct Oracle database package dependencies were identified in the legacy Form.
 
 ### LOVs
 
@@ -99,20 +101,35 @@ The Form references shared Oracle Forms Object Libraries including:
 
 These libraries provide shared visual, interface, and application behavior used by the legacy Forms application.
 
-## Migration Considerations
+## APEX Reference Implementation
 
-The functionality can be implemented in Oracle APEX as a relatively small transactional workflow.
+This sample has already been successfully migrated to Oracle APEX.
 
-During migration:
+The completed reference implementation is available under `APEX_Reference/` and includes:
 
-* Shift reference generation should not retain the legacy `MAX(...) + 1` approach. A database sequence, identity mechanism, or centralized API should be used instead.
-* Prevention of multiple simultaneous open shifts should be enforced transaction-safely in the database rather than relying only on Forms validation.
-* Current user and information-center context should use the equivalent APEX application/session security context.
-* Legacy Forms presentation and navigation utilities from shared Object Libraries do not need to be reproduced directly where equivalent APEX functionality exists.
-* Business rules currently implemented in Forms triggers should preferably be centralized in reusable database logic where appropriate.
+* Oracle APEX Page 49 — **Start Cashier Shift**
+* The shared `BIL_CASHIER_SHIFT` backend package
+* Screenshots showing the page with and without an active cashier shift
+* A dedicated README describing the migrated architecture and modernization approach
+
+The migration did not reproduce the Oracle Form one-to-one. The resulting implementation separates the UI from reusable backend business logic.
+
+Key changes include:
+
+* The start-shift workflow is implemented as an APEX modal page.
+* Current user and information-center values are obtained from the application session rather than manually selected in the page.
+* Cashier-shift operations are centralized in the reusable `BIL_CASHIER_SHIFT` package.
+* The legacy `MAX(...) + 1` shift-reference generation is no longer used; the database-generated identifier is returned after insert.
+* Duplicate active-shift protection is enforced in the backend rather than relying only on UI validation.
+* Shared shift rules can be reused by related billing workflows, including invoice shift validation.
+
+The APEX implementation is provided as a reference for the expected migration approach and quality level. It is not intended to prescribe an exact one-to-one design for other Forms.
+
+See [`APEX_Reference/README.md`](APEX_Reference/README.md) for details of the migrated implementation.
 
 ## Files
 
 * `Cashier_Shifts_Open.fmb` — Original Oracle Forms module
 * `Cashier_Shifts_Open.xml` — XML export for source inspection and analysis
 * `screenshot.png` — Screenshot of the current Oracle Forms user interface
+* `APEX_Reference/` — Completed Oracle APEX reference implementation, backend package, screenshots, and migration notes
