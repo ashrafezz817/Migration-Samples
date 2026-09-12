@@ -98,8 +98,6 @@ Header operations are delegated to `BIL_OFFERS_ADMIN` rather than implemented as
 
 The backend file included in this sample is a **migration reference extract** containing only the package functionality required by Pages 63 and 64.
 
-Additional production package functionality unrelated to bundled offers is intentionally not included.
-
 The extract exposes the following bundled-offer operations:
 
 #### Bundle Header
