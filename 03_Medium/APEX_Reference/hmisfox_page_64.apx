@@ -1,0 +1,865 @@
+page 64 (
+    name: Manage Bundled Offer
+    alias: MANAGE-BUNDLED-OFFER
+    title: Manage Bundled Offer
+    pageGroup: @billing
+    appearance {
+        pageMode: modalDialog
+        dialogTemplate: @/modal-dialog
+        templateOptions: #DEFAULT#
+    }
+    dialog {
+        chained: false
+    }
+    security {
+        authorizationScheme: @has-permission
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+    }
+
+    region buttons (
+        name: Buttons
+        type: staticContent
+        layout {
+            sequence: 20
+            slot: REGION_POSITION_03
+        }
+        appearance {
+            template: @/buttons-container
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region offer-details (
+        name: Bundle Details
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: regionBody
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    pageItem P64_DESCRIPTION (
+        type: textarea
+        label {
+            label: Description
+            alignment: left
+        }
+        settings {
+            resizable: false
+            charCounter: true
+        }
+        layout {
+            sequence: 70
+            region: @offer-details
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+            height: 3
+        }
+        validation {
+            maxLength: 500
+        }
+        sessionState {
+            storage: request
+        }
+        readOnly {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P64_OFERID is not null
+                and nvl(
+                        fnd_app_security.has_permission(
+                            'BILLING_BUNDLED_OFFERS_UPDATE'
+                        ),
+                        'FALSE'
+                    ) <> 'TRUE'
+                ```
+        }
+    )
+
+    pageItem P64_ENDDATE (
+        type: datePicker
+        label {
+            label: End Date
+            alignment: left
+        }
+        layout {
+            sequence: 50
+            region: @offer-details
+            slot: regionBody
+            alignment: left
+            startNewRow: false
+        }
+        appearance {
+            template: @/required-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        validation {
+            valueRequired: true
+        }
+        sessionState {
+            storage: request
+        }
+        readOnly {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P64_OFERID is not null
+                and nvl(
+                        fnd_app_security.has_permission(
+                            'BILLING_BUNDLED_OFFERS_UPDATE'
+                        ),
+                        'FALSE'
+                    ) <> 'TRUE'
+                ```
+        }
+        help {
+            helpText: The offer remains active through the end date; both start and end dates are inclusive.
+        }
+    )
+
+    pageItem P64_OBJECT_VERSION_NUMBER (
+        type: hidden
+        layout {
+            sequence: 20
+            region: @offer-details
+            slot: regionBody
+        }
+        sessionState {
+            storage: request
+        }
+    )
+
+    pageItem P64_OFERID (
+        type: hidden
+        layout {
+            sequence: 10
+            region: @offer-details
+            slot: regionBody
+        }
+        sessionState {
+            storage: request
+        }
+    )
+
+    pageItem P64_OFFER_NAME (
+        type: textField
+        label {
+            label: Bundle Name
+            alignment: left
+        }
+        layout {
+            sequence: 30
+            region: @offer-details
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/required-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        validation {
+            valueRequired: true
+            maxLength: 50
+        }
+        sessionState {
+            storage: request
+        }
+        readOnly {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P64_OFERID is not null
+                and nvl(
+                        fnd_app_security.has_permission(
+                            'BILLING_BUNDLED_OFFERS_UPDATE'
+                        ),
+                        'FALSE'
+                    ) <> 'TRUE'
+                ```
+        }
+    )
+
+    pageItem P64_START_DATE (
+        type: datePicker
+        label {
+            label: Start Date
+            alignment: left
+        }
+        layout {
+            sequence: 40
+            region: @offer-details
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/required-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        validation {
+            valueRequired: true
+        }
+        sessionState {
+            storage: request
+        }
+        readOnly {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P64_OFERID is not null
+                and nvl(
+                        fnd_app_security.has_permission(
+                            'BILLING_BUNDLED_OFFERS_UPDATE'
+                        ),
+                        'FALSE'
+                    ) <> 'TRUE'
+                ```
+        }
+    )
+
+    pageItem P64_VALID_DAYES (
+        type: numberField
+        label {
+            label: Validity Days
+            alignment: left
+        }
+        settings {
+            minValue: 0
+            maxValue: 9999
+        }
+        layout {
+            sequence: 60
+            region: @offer-details
+            slot: regionBody
+            alignment: left
+            startNewRow: false
+        }
+        appearance {
+            template: @/required-floating
+            templateOptions: #DEFAULT#
+            formatMask: FM9990
+            width: 30
+        }
+        validation {
+            valueRequired: true
+        }
+        sessionState {
+            storage: request
+        }
+        readOnly {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P64_OFERID is not null
+                and nvl(
+                        fnd_app_security.has_permission(
+                            'BILLING_BUNDLED_OFFERS_UPDATE'
+                        ),
+                        'FALSE'
+                    ) <> 'TRUE'
+                ```
+        }
+        help {
+            helpText: Number of days the bundled offer entitlement will remain valid after activation.
+        }
+    )
+
+    button cancel (
+        buttonName: CANCEL
+        label: Cancel
+        layout {
+            sequence: 10
+            region: @buttons
+            slot: CLOSE
+        }
+        appearance {
+            buttonTemplate: @/text
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: triggerAction
+        }
+
+        triggerAction native-dialog-cancel (
+            action: cancelDialog
+            execution {
+                sequence: 10
+            }
+        )
+
+    )
+
+    button create (
+        buttonName: CREATE
+        label: Create
+        layout {
+            sequence: 40
+            region: @buttons
+            slot: NEXT
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            showProcessing: true
+            warnOnUnsavedChanges: doNotCheck
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P64_OFERID is null
+                and fnd_app_security.has_permission('BILLING_BUNDLED_OFFERS_CREATE') = 'TRUE'
+                ```
+        }
+    )
+
+    button retire-offer (
+        buttonName: RETIRE_BUNDLE
+        label: Retire Bundle
+        layout {
+            sequence: 20
+            region: @buttons
+            slot: DELETE
+        }
+        appearance {
+            buttonTemplate: @/text
+            templateOptions: [
+                #DEFAULT#
+                t-Button--danger
+            ]
+        }
+        behavior {
+            executeValidations: false
+            showProcessing: true
+            warnOnUnsavedChanges: doNotCheck
+            requiresConfirmation: true
+        }
+        confirmation {
+            message: Are you sure you want to retire this bundled offer? The bundle and all active components will be retired.
+            style: danger
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P64_OFERID is not null
+                and fnd_app_security.has_permission('BILLING_BUNDLED_OFFERS_RETIRE') = 'TRUE'
+                ```
+        }
+    )
+
+    button save (
+        buttonName: SAVE
+        label: Apply Changes
+        layout {
+            sequence: 30
+            region: @buttons
+            slot: NEXT
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            showProcessing: true
+            warnOnUnsavedChanges: doNotCheck
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P64_OFERID is not null
+                and fnd_app_security.has_permission('BILLING_BUNDLED_OFFERS_UPDATE') = 'TRUE'
+                ```
+        }
+    )
+
+    validation end-date-must-not-precede-start-date (
+        name: End Date Must Not Precede Start Date
+        execution {
+            sequence: 10
+        }
+        validation {
+            plsqlExpression:
+                ```plsql
+                apex_session_state.get_timestamp('P64_ENDDATE')
+                >=
+                apex_session_state.get_timestamp('P64_START_DATE')
+                ```
+        }
+        error {
+            errorMessage: End Date must be on or after Start Date.
+            associatedItem: @P64_ENDDATE
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CREATE,SAVE
+        }
+    )
+
+    validation valid-days-must-be-a-whole-number (
+        name: Valid Days Must Be a Whole Number
+        execution {
+            sequence: 20
+        }
+        validation {
+            plsqlExpression:
+                ```plsql
+                :P64_VALID_DAYES between 0 and 9999
+                and :P64_VALID_DAYES = trunc(:P64_VALID_DAYES)
+                ```
+        }
+        error {
+            errorMessage: Valid Days must be a whole number from 0 through 9999.
+            associatedItem: @P64_VALID_DAYES
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CREATE,SAVE
+        }
+    )
+
+    process authorize-offer-mode (
+        name: Authorize Offer Mode
+        type: executeCode
+        source {
+            plsqlCode:
+                ```plsql
+                declare
+                    l_can_create boolean :=
+                        nvl(
+                            fnd_app_security.has_permission(
+                                'BILLING_BUNDLED_OFFERS_CREATE'
+                            ),
+                            'FALSE'
+                        ) = 'TRUE';
+                
+                    l_can_update boolean :=
+                        nvl(
+                            fnd_app_security.has_permission(
+                                'BILLING_BUNDLED_OFFERS_UPDATE'
+                            ),
+                            'FALSE'
+                        ) = 'TRUE';
+                
+                    l_can_retire boolean :=
+                        nvl(
+                            fnd_app_security.has_permission(
+                                'BILLING_BUNDLED_OFFERS_RETIRE'
+                            ),
+                            'FALSE'
+                        ) = 'TRUE';
+                begin
+                    if :P64_OFERID is null then
+                        if not l_can_create then
+                            raise_application_error(
+                                -20001,
+                                'You are not authorized to create bundled offers.'
+                            );
+                        end if;
+                    else
+                        if not l_can_update
+                           and not l_can_retire
+                        then
+                            raise_application_error(
+                                -20002,
+                                'You are not authorized to manage this bundled offer.'
+                            );
+                        end if;
+                    end if;
+                end;
+                ```
+        }
+        execution {
+            sequence: 20
+            point: beforeHeader
+        }
+        advanced {
+            executionMappingIdentifier: 43073843230804237
+        }
+    )
+
+    process close-dialog (
+        name: Close Dialog
+        type: closeDialog
+        settings {
+            itemsToReturn: P64_OFERID
+        }
+        execution {
+            sequence: 40
+        }
+        advanced {
+            executionMappingIdentifier: 43083886606804251
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CREATE,SAVE,RETIRE_BUNDLE
+        }
+    )
+
+    process create-offer (
+        name: Create Bundled Offer
+        type: invokeApi
+        invoke {
+            package: BIL_OFFERS_ADMIN
+            procedureOrFunction: CREATE_BUNDLED_OFFER
+        }
+        execution {
+            sequence: 10
+        }
+        successMessage {
+            successMessage: Bundled offer created successfully.
+        }
+        advanced {
+            executionMappingIdentifier: 43074645586804240
+        }
+        serverSideCondition {
+            whenButtonPressed: @create
+            type: expression
+            plsqlExpression: fnd_app_security.has_permission('BILLING_BUNDLED_OFFERS_CREATE') = 'TRUE'
+        }
+
+        parameter o_object_version_number (
+            parameter {
+                direction: out
+                dataType: number
+            }
+            value {
+                item: P64_OBJECT_VERSION_NUMBER
+            }
+            advanced {
+                displaySequence: 60
+            }
+        )
+
+        parameter o_offer_id (
+            parameter {
+                direction: out
+                dataType: number
+            }
+            value {
+                item: P64_OFERID
+            }
+            advanced {
+                displaySequence: 50
+            }
+        )
+
+        parameter p_description (
+            value {
+                type: item
+                item: P64_DESCRIPTION
+            }
+            advanced {
+                displaySequence: 40
+            }
+        )
+
+        parameter p_end_date (
+            parameter {
+                dataType: date
+            }
+            value {
+                type: item
+                item: P64_ENDDATE
+            }
+            advanced {
+                displaySequence: 30
+            }
+        )
+
+        parameter p_offer_name (
+            value {
+                type: item
+                item: P64_OFFER_NAME
+            }
+            advanced {
+                displaySequence: 10
+            }
+        )
+
+        parameter p_start_date (
+            parameter {
+                dataType: date
+            }
+            value {
+                type: item
+                item: P64_START_DATE
+            }
+            advanced {
+                displaySequence: 20
+            }
+        )
+
+        parameter p_valid_days (
+            parameter {
+                dataType: number
+            }
+            value {
+                type: item
+                item: P64_VALID_DAYES
+            }
+            advanced {
+                displaySequence: 70
+            }
+        )
+
+    )
+
+    process initialize-manage-offer (
+        name: Initialize Manage Offer
+        type: executeCode
+        source {
+            plsqlCode:
+                ```plsql
+                begin
+                    if :P64_OFERID is null then
+                        :P64_OFFER_NAME           := null;
+                        :P64_START_DATE           := trunc(sysdate);
+                        :P64_ENDDATE              := trunc(sysdate) + 30;
+                        :P64_VALID_DAYES          := null;
+                        :P64_DESCRIPTION          := null;
+                        :P64_OBJECT_VERSION_NUMBER := null;
+                    else
+                        select
+                            o.offer_name,
+                            o.start_date,
+                            o.enddate,
+                            o.valid_dayes,
+                            o.notes,
+                            o.object_version_number
+                        into
+                            :P64_OFFER_NAME,
+                            :P64_START_DATE,
+                            :P64_ENDDATE,
+                            :P64_VALID_DAYES,
+                            :P64_DESCRIPTION,
+                            :P64_OBJECT_VERSION_NUMBER
+                        from offers o
+                        where o.oferid = :P64_OFERID
+                          and o.offer_type = 0
+                          and o.is_deleted = 'N'
+                          and o.offer_info_center = :G_INFO_CENTER_ID;
+                    end if;
+                
+                exception
+                    when no_data_found then
+                        raise_application_error(
+                            -20003,
+                            'The bundled offer was not found or is not available for the current information center.'
+                        );
+                end;
+                ```
+        }
+        execution {
+            sequence: 30
+            point: beforeHeader
+        }
+        advanced {
+            executionMappingIdentifier: 43074204650804239
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression: apex_application.g_request is null
+        }
+    )
+
+    process retire-offer (
+        name: Retire Bundled Offer
+        type: invokeApi
+        invoke {
+            package: BIL_OFFERS_ADMIN
+            procedureOrFunction: RETIRE_BUNDLED_OFFER
+        }
+        execution {
+            sequence: 30
+        }
+        successMessage {
+            successMessage: Bundled offer retired successfully.
+        }
+        advanced {
+            executionMappingIdentifier: 43081976685804248
+        }
+        serverSideCondition {
+            whenButtonPressed: @retire-offer
+            type: expression
+            plsqlExpression: fnd_app_security.has_permission('BILLING_BUNDLED_OFFERS_RETIRE') = 'TRUE'
+        }
+
+        parameter p_delete_reason (
+            value {
+                type: null
+            }
+            advanced {
+                displaySequence: 20
+            }
+        )
+
+        parameter p_expected_ovn (
+            parameter {
+                dataType: number
+            }
+            value {
+                type: item
+                item: P64_OBJECT_VERSION_NUMBER
+            }
+            advanced {
+                displaySequence: 30
+            }
+        )
+
+        parameter p_offer_id (
+            parameter {
+                dataType: number
+            }
+            value {
+                type: item
+                item: P64_OFERID
+            }
+            advanced {
+                displaySequence: 10
+            }
+        )
+
+    )
+
+    process update-offer (
+        name: Update Bundled Offer
+        type: invokeApi
+        invoke {
+            package: BIL_OFFERS_ADMIN
+            procedureOrFunction: UPDATE_BUNDLED_OFFER
+        }
+        execution {
+            sequence: 20
+        }
+        successMessage {
+            successMessage: Bundled offer updated successfully.
+        }
+        advanced {
+            executionMappingIdentifier: 43078082074804245
+        }
+        serverSideCondition {
+            whenButtonPressed: @save
+            type: expression
+            plsqlExpression: fnd_app_security.has_permission('BILLING_BUNDLED_OFFERS_UPDATE') = 'TRUE'
+        }
+
+        parameter o_new_ovn (
+            parameter {
+                direction: out
+                dataType: number
+            }
+            value {
+                item: P64_OBJECT_VERSION_NUMBER
+            }
+            advanced {
+                displaySequence: 70
+            }
+        )
+
+        parameter p_description (
+            value {
+                type: item
+                item: P64_DESCRIPTION
+            }
+            advanced {
+                displaySequence: 50
+            }
+        )
+
+        parameter p_end_date (
+            parameter {
+                dataType: date
+            }
+            value {
+                type: item
+                item: P64_ENDDATE
+            }
+            advanced {
+                displaySequence: 40
+            }
+        )
+
+        parameter p_expected_ovn (
+            parameter {
+                dataType: number
+            }
+            value {
+                type: item
+                item: P64_OBJECT_VERSION_NUMBER
+            }
+            advanced {
+                displaySequence: 60
+            }
+        )
+
+        parameter p_offer_id (
+            parameter {
+                dataType: number
+            }
+            value {
+                type: item
+                item: P64_OFERID
+            }
+            advanced {
+                displaySequence: 10
+            }
+        )
+
+        parameter p_offer_name (
+            value {
+                type: item
+                item: P64_OFFER_NAME
+            }
+            advanced {
+                displaySequence: 20
+            }
+        )
+
+        parameter p_start_date (
+            parameter {
+                dataType: date
+            }
+            value {
+                type: item
+                item: P64_START_DATE
+            }
+            advanced {
+                displaySequence: 30
+            }
+        )
+
+        parameter p_valid_days (
+            parameter {
+                dataType: number
+            }
+            value {
+                type: item
+                item: P64_VALID_DAYES
+            }
+            advanced {
+                displaySequence: 80
+            }
+        )
+
+    )
+
+)
+

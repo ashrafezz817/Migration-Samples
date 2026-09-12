@@ -1,0 +1,2442 @@
+page 63 (
+    name: Bundled Offers
+    alias: BUNDLED-OFFERS
+    title: Bundled Offers
+    pageGroup: @billing
+    appearance {
+        pageTemplate: @/left-side-column
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+    javaScript {
+        functionAndGlobalVariableDeclaration:
+            ```javascript-browser
+            window.p63BundleSearch = (function () {
+                "use strict";
+            
+                let timerId = null;
+            
+                function refreshNow() {
+                    if (timerId !== null) {
+                        window.clearTimeout(timerId);
+                        timerId = null;
+                    }
+            
+                    const region =
+                        apex.region("bundle_list");
+            
+                    if (region) {
+                        region.refresh();
+                    }
+                }
+            
+                function refreshDebounced() {
+                    if (timerId !== null) {
+                        window.clearTimeout(timerId);
+                    }
+            
+                    timerId = window.setTimeout(
+                        function () {
+                            timerId = null;
+                            refreshNow();
+                        },
+                        300
+                    );
+                }
+            
+                return {
+                    refreshNow: refreshNow,
+                    refreshDebounced: refreshDebounced
+                };
+            })();
+            
+            
+            
+            ```
+    }
+    css {
+        fileUrls: [
+            #APP_FILES#empty-state.css
+            #APP_FILES#badges.css
+        ]
+        inline:
+            ```css
+            /* =========================================================
+               BUNDLE OVERVIEW
+               Allows long bundle names, descriptions, and detail values
+               to wrap without overflowing the Content Row.
+               ========================================================= */
+            
+            #bundle_overview {
+                overflow-wrap: anywhere;
+            }
+            
+            
+            /* =========================================================
+               BUNDLE DESCRIPTION
+               Keeps the bundle description visually secondary to the
+               bundle name while maintaining readable contrast.
+               ========================================================= */
+            
+            .bundle-overview-description {
+                max-width: 80ch;
+                margin-top: 4px;
+            
+                font-size: 13px;
+                line-height: 1.5;
+                color: #344054;
+            }
+            
+            .bundle-overview-empty {
+                font-style: italic;
+                color: var(
+                    --ut-component-text-muted-color,
+                    #667085
+                );
+            }
+            
+            
+            /* =========================================================
+               BUNDLE DETAILS
+               Distributes bundle metadata and financial totals evenly
+               across the available region width.
+               ========================================================= */
+            
+            .bundle-overview-layout {
+                display: flex;
+                gap: 20px;
+                margin-top: 20px;
+                align-items: stretch;
+            }
+            
+            /* Left: metadata grid */
+            .bundle-overview-meta {
+                flex: 1.4;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+                align-content: center;
+            }
+            
+            .bundle-overview-detail {
+                background: #f7f9fb;
+                border-radius: 8px;
+                padding: 12px 14px;
+                min-width: 0;
+            }
+            
+            .bundle-overview-detail__label {
+                display: block;
+                margin-bottom: 5px;
+                font-size: 11px;
+                font-weight: 600;
+                line-height: 1.4;
+                letter-spacing: 0.03em;
+                text-transform: uppercase;
+                color: var(--ut-component-text-muted-color, #667085);
+            }
+            
+            .bundle-overview-detail__value {
+                display: block;
+                overflow-wrap: anywhere;
+                font-size: 12px;
+                font-weight: 500;
+                color: #101828;
+            }
+            
+            /* Right: savings hero panel */
+            .bundle-overview-savings {
+                position: relative;
+                overflow: hidden;
+                background: #23891E;
+                border-radius: 12px;
+                padding: 16px 18px;
+                color: #ffffff;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                flex: 0.7;
+                gap: 4px;
+                box-shadow: 0 8px 20px rgba(16, 24, 40, 0.14);
+            }
+            
+            .bundle-overview-savings::after {
+                content: none;
+                position: absolute;
+                top: -40px;
+                right: -40px;
+                width: 140px;
+                height: 140px;
+                border-radius: 50%;
+                background: #ffffff;
+            }
+            
+            .bundle-overview-savings__label {
+                position: relative;
+                display: block;
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                color: #ffffff;
+            }
+            
+            .bundle-overview-savings__amount {
+                position: relative;
+                margin-top: 4px;
+                font-size: 26px;
+                font-weight: 400;
+                font-variant-numeric: tabular-nums;
+            }
+            
+            .bundle-overview-savings__currency {
+                margin-left: 6px;
+                font-size: 15px;
+                font-weight: 600;
+                color: #ffffff;
+            }
+            
+            .bundle-overview-savings__sub {
+                position: relative;
+                display: block;
+                margin-top: 4px;
+                font-size: 11px;
+                color: #ffffff;
+            }
+            
+            .bundle-overview-savings__divider {
+                position: relative;
+                height: 1px;
+                background: #ffffff;
+                margin: 12px 0;
+            }
+            
+            .bundle-overview-savings__totals {
+                position: relative;
+                display: flex;
+                justify-content: space-between;
+                gap: 16px;
+            }
+            
+            .bundle-overview-savings__totlabel {
+                display: block;
+                margin-bottom: 6px;
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                color: #ffffff;
+            }
+            
+            .bundle-overview-savings__strike {
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: line-through;
+                color: #ffffff;
+            }
+            
+            .bundle-overview-savings__pill {
+                display: inline-block;
+                background: #22c55e;
+                color: #fff;
+                font-size: 14px;
+                font-weight: 700;
+                padding: 3px 10px;
+                border-radius: 6px;
+            }
+            
+            .bundle-overview-savings__note {
+                position: relative;
+                font-size: 10px;
+                font-weight: 500;
+                line-height: 1.4;
+                color: rgba(255, 255, 255, 0.9);
+            }
+            
+            /* Stack on narrow screens */
+            @media (max-width: 900px) {
+                .bundle-overview-layout {
+                    flex-direction: column;
+                }
+            }
+            @media (max-width: 600px) {
+                .bundle-overview-meta {
+                    grid-template-columns: 1fr;
+                }
+            }
+            
+            
+            /* =========================================================
+               BUNDLE FINANCIAL VALUES
+               Makes Original Total, Bundle Total, and Savings more
+               prominent and keeps their digits consistently aligned.
+               ========================================================= */
+            
+            .bundle-overview-detail--financial
+            .bundle-overview-detail__value {
+                font-size: 16px;
+                font-weight: 700;
+                font-variant-numeric: tabular-nums;
+            }
+            
+            
+            /* =========================================================
+               TABLET LAYOUT
+               Uses two balanced columns when four columns become too
+               narrow for comfortable reading.
+               ========================================================= */
+            
+            @media (max-width: 1100px) {
+                .bundle-overview-details {
+                    grid-template-columns:
+                        repeat(2, minmax(0, 1fr));
+            
+                    gap: 18px 24px;
+                }
+            }
+            
+            
+            /* =========================================================
+               MOBILE LAYOUT
+               Stacks all bundle facts vertically on narrow screens.
+               ========================================================= */
+            
+            @media (max-width: 600px) {
+                .bundle-overview-details {
+                    grid-template-columns: 1fr;
+                    gap: 14px;
+                }
+            
+                .bundle-overview-detail--financial
+                .bundle-overview-detail__value {
+                    font-size: 15px;
+                }
+            }
+            
+            /* =========================================================
+               BUNDLE STATUS
+               Displays the prominent solid status badge at inline end.
+               ========================================================= */
+            
+            .bundle-overview-status {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            @media (max-width: 600px) {
+                .bundle-overview-status {
+                    justify-content: flex-start;
+                }
+            }
+            ```
+    }
+    security {
+        authorizationScheme: @has-permission
+        pageAccessProtection: argumentsMustHaveChecksum
+    }
+    advanced {
+        enableDuplicatePageSubmissions: false
+    }
+
+    region breadcrumb (
+        name: Breadcrumb
+        type: breadcrumb
+        source {
+            breadcrumb: @breadcrumb
+        }
+        layout {
+            sequence: 20
+            slot: regionBody
+        }
+        appearance {
+            template: @/title-bar
+            templateOptions: [
+                #DEFAULT#
+                t-BreadcrumbRegion--useBreadcrumbTitle
+            ]
+        }
+        componentAppearance {
+            breadcrumbTemplate: @/breadcrumb
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region bundle-components (
+        name: Bundle Components
+        type: interactiveGrid
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                with component_base as (
+                    select
+                        d.row_id,
+                        d.oferid,
+                        d.list_id,
+                        d.serviceid,
+                        d.serviceid as original_serviceid,
+                        d.qty,
+                        d.org_price,
+                        d.offer_price,
+                        d.object_version_number,
+                        s.vat_rate
+                
+                    from offers_dtl d
+                
+                    join offers o
+                      on o.oferid = d.oferid
+                     and o.list_id = d.list_id
+                
+                    join services s
+                      on s.serviceid = d.serviceid
+                     and s.list_id = d.list_id
+                
+                    where d.oferid = :P63_OFERID
+                      and o.offer_type = 0
+                      and o.offer_info_center = :G_INFO_CENTER_ID
+                      and (
+                            (
+                                o.is_deleted = 'N'
+                                and d.is_deleted = 'N'
+                            )
+                            or
+                            (
+                                o.is_deleted = 'Y'
+                                and d.is_deleted = 'Y'
+                                and d.delete_reason = 'OFFER_RETIRED'
+                            )
+                          )
+                )
+                select
+                    row_id,
+                    oferid,
+                    list_id,
+                    serviceid,
+                    original_serviceid,
+                    qty,
+                    org_price,
+                    offer_price,
+                
+                    case
+                        when vat_rate is null then
+                            'Exempt'
+                        else
+                            to_char(vat_rate, 'TM9') || '% VAT'
+                    end as vat_status,
+                
+                    round(
+                        qty * org_price,
+                        2
+                    ) as original_line_total,
+                
+                    round(
+                        qty * offer_price,
+                        2
+                    ) as bundle_line_total,
+                
+                    round(
+                        qty * org_price,
+                        2
+                    )
+                    -
+                    round(
+                        qty * offer_price,
+                        2
+                    ) as savings,
+                
+                    object_version_number
+                
+                from component_base
+                ```
+            pageItemsToSubmit: P63_OFERID
+        }
+        layout {
+            sequence: 50
+            parentRegion: @container
+            slot: regionBody
+        }
+        appearance {
+            template: @/interactive-report
+            templateOptions: [
+                #DEFAULT#
+                t-IRR-region--noBorders
+                t-IRR-region--hideHeader js-addHiddenHeadingRoleDesc
+            ]
+            cssClasses: js-detail-region
+        }
+        advanced {
+            htmlDomId: bundle_components_ig
+        }
+        serverSideCondition {
+            type: itemIsNotNull
+            item: P63_OFERID
+        }
+        edit {
+            enabled: true
+            allowedOperations: [
+                add
+                update
+                delete
+            ]
+        }
+        editAuthorization {
+            add: @can-manage-bundled-offers-lines
+            update: @can-manage-bundled-offers-lines
+            delete: @can-manage-bundled-offers-lines
+        }
+        toolbar {
+            controls: [
+                resetButton
+                saveButton
+            ]
+            addButtonLabel: Add Component
+        }
+        enableUsersTo {
+            defineChartView: false
+            download: false
+        }
+        componentAdvanced {
+            initJavaScriptFunction:
+                ```javascript-browser
+                function (options) {
+                    "use strict";
+                
+                    const $ = apex.jQuery;
+                
+                    const editable =
+                        $v("P63_BUNDLE_RETIRED") !== "Y";
+                
+                    const gridOptions =
+                        apex.util.getNestedObject(
+                            options,
+                            "defaultGridViewOptions"
+                        );
+                
+                    const modelOptions =
+                        apex.util.getNestedObject(
+                            options,
+                            "defaultModelOptions"
+                        );
+                
+                    const text =
+                        apex.util.getNestedObject(
+                            options,
+                            "text"
+                        );
+                
+                    const toolbarData =
+                        $.apex.interactiveGrid.copyDefaultToolbar();
+                
+                    const rightActionsGroup =
+                        toolbarData.toolbarFind("actions4");
+                
+                    const previousInitActions =
+                        options.initActions;
+                
+                    /*
+                     * Disable editing when the selected bundled offer
+                     * has been retired.
+                     */
+                    gridOptions.editable = editable;
+                
+                    /*
+                     * Keep rows marked for deletion visible until Save.
+                     */
+                    gridOptions.hideDeletedRows = false;
+                    modelOptions.onlyMarkForDelete = true;
+                
+                    text.addRowButton = "Add Component";
+                
+                    /*
+                     * Remove unnecessary standard Interactive Grid
+                     * toolbar groups.
+                     */
+                    [
+                        "search",
+                        "reports",
+                        "views",
+                        "actions1"
+                    ].forEach(function (id) {
+                        toolbarData.toolbarRemove(id);
+                    });
+                
+                    /*
+                     * Add native Interactive Grid row actions
+                     * to the right side of the toolbar.
+                     */
+                    if (rightActionsGroup) {
+                        rightActionsGroup.controls = [
+                            {
+                                type: "BUTTON",
+                                action: "selection-revert",
+                                iconOnly: false
+                            },
+                            {
+                                type: "BUTTON",
+                                action: "selection-delete",
+                                iconOnly: false
+                            }
+                        ];
+                    }
+                
+                    options.toolbarData = toolbarData;
+                
+                    options.initActions = function (actions) {
+                        let removeAction;
+                        let revertAction;
+                
+                        /*
+                         * Preserve initialization supplied by APEX
+                         * or other region code.
+                         */
+                        if (previousInitActions) {
+                            previousInitActions(actions);
+                        }
+                
+                        actions.hide("single-row-view");
+                
+                        /*
+                         * Rename the native delete-selected action.
+                         */
+                        removeAction =
+                            actions.lookup("selection-delete");
+                
+                        if (removeAction) {
+                            removeAction.label =
+                                "Remove Selected";
+                
+                            removeAction.title =
+                                "Mark the selected bundle components for removal";
+                
+                            removeAction.icon = "";
+                
+                            actions.update(
+                                "selection-delete"
+                            );
+                        }
+                
+                        /*
+                         * Revert restores the selected rows to their
+                         * state when the grid was last refreshed.
+                         */
+                        revertAction =
+                            actions.lookup("selection-revert");
+                
+                        if (revertAction) {
+                            revertAction.label =
+                                "Revert Selected";
+                
+                            revertAction.title =
+                                "Discard all unsaved changes for the selected bundle components";
+                
+                            revertAction.icon = "";
+                
+                            actions.update(
+                                "selection-revert"
+                            );
+                        }
+                    };
+                
+                    return options;
+                }
+                ```
+        }
+        advanced {
+            savedReportMappingIdentifier: 80283989887768465
+        }
+
+        savedReport primary (
+            visibility: primary
+            view {
+                default: grid
+            }
+            singleRowView {
+                displayedColumns: true
+            }
+        )
+
+        column APEX$ROW_SELECTOR (
+            type: rowSelector
+            layout {
+                sequence: 10
+            }
+        )
+
+        column BUNDLE_LINE_TOTAL (
+            type: numberField
+            heading {
+                heading: Bundle Line Total
+                alignment: end
+            }
+            layout {
+                sequence: 130
+                columnAlignment: end
+            }
+            source {
+                databaseColumn: BUNDLE_LINE_TOTAL
+                dataType: number
+            }
+            columnFilter {
+                lovType: none
+            }
+            advanced {
+                customAttributes: readonly="readonly" tabindex="-1"
+            }
+        )
+
+        column LIST_ID (
+            type: hidden
+            heading {
+                heading: List Id
+            }
+            layout {
+                sequence: 50
+            }
+            source {
+                databaseColumn: LIST_ID
+                dataType: number
+                queryOnly: true
+            }
+            exportPrinting {
+                includeInExportPrint: false
+            }
+        )
+
+        column OBJECT_VERSION_NUMBER (
+            type: hidden
+            heading {
+                heading: Object Version Number
+            }
+            layout {
+                sequence: 110
+            }
+            source {
+                databaseColumn: OBJECT_VERSION_NUMBER
+                dataType: number
+            }
+            exportPrinting {
+                includeInExportPrint: false
+            }
+        )
+
+        column OFERID (
+            type: hidden
+            heading {
+                heading: Oferid
+            }
+            layout {
+                sequence: 40
+            }
+            source {
+                databaseColumn: OFERID
+                dataType: number
+                queryOnly: true
+            }
+            exportPrinting {
+                includeInExportPrint: false
+            }
+        )
+
+        column OFFER_PRICE (
+            type: numberField
+            heading {
+                heading: Bundle Unit Price
+                alignment: end
+            }
+            settings {
+                minValue: 0
+            }
+            layout {
+                sequence: 100
+                columnAlignment: end
+            }
+            appearance {
+                formatMask: FM999G999G990D00
+            }
+            validation {
+                valueRequired: true
+            }
+            source {
+                databaseColumn: OFFER_PRICE
+                dataType: number
+            }
+            columnFilter {
+                lovType: none
+            }
+        )
+
+        column ORG_PRICE (
+            type: numberField
+            heading {
+                heading: Plan Unit Price
+                alignment: end
+            }
+            layout {
+                sequence: 90
+                columnAlignment: end
+            }
+            appearance {
+                formatMask: FM999G999G990D00
+            }
+            source {
+                databaseColumn: ORG_PRICE
+                dataType: number
+            }
+            columnFilter {
+                lovType: none
+            }
+            advanced {
+                customAttributes: readonly="readonly" tabindex="-1"
+            }
+        )
+
+        column ORIGINAL_LINE_TOTAL (
+            type: numberField
+            heading {
+                heading: Original Line Total
+                alignment: end
+            }
+            layout {
+                sequence: 120
+                columnAlignment: end
+            }
+            source {
+                databaseColumn: ORIGINAL_LINE_TOTAL
+                dataType: number
+            }
+            columnFilter {
+                lovType: none
+            }
+            advanced {
+                customAttributes: readonly="readonly" tabindex="-1"
+            }
+        )
+
+        column ORIGINAL_SERVICEID (
+            type: hidden
+            heading {
+                heading: Original Serviceid
+            }
+            layout {
+                sequence: 80
+            }
+            source {
+                databaseColumn: ORIGINAL_SERVICEID
+                dataType: varchar2
+                queryOnly: true
+            }
+            exportPrinting {
+                includeInExportPrint: false
+            }
+        )
+
+        column QTY (
+            type: numberField
+            heading {
+                heading: Quantity
+                alignment: end
+            }
+            settings {
+                minValue: 1
+                maxValue: 999
+            }
+            layout {
+                sequence: 70
+                columnAlignment: end
+            }
+            appearance {
+                formatMask: FM990
+            }
+            validation {
+                valueRequired: true
+            }
+            source {
+                databaseColumn: QTY
+                dataType: number
+            }
+            default {
+                type: static
+                staticValue: 1
+            }
+            columnFilter {
+                lovType: none
+            }
+        )
+
+        column ROW_ID (
+            type: hidden
+            layout {
+                sequence: 30
+            }
+            source {
+                databaseColumn: ROW_ID
+                dataType: number
+                primaryKey: true
+            }
+            exportPrinting {
+                includeInExportPrint: false
+            }
+        )
+
+        column SAVINGS (
+            type: numberField
+            heading {
+                heading: Savings
+                alignment: end
+            }
+            layout {
+                sequence: 140
+                columnAlignment: end
+            }
+            source {
+                databaseColumn: SAVINGS
+                dataType: number
+            }
+            columnFilter {
+                lovType: none
+            }
+            advanced {
+                customAttributes: readonly="readonly" tabindex="-1"
+            }
+        )
+
+        column SERVICEID (
+            type: popupLov
+            heading {
+                heading: Service
+            }
+            lov {
+                type: sqlQuery
+                sqlQuery:
+                    ```sql
+                    with offer_context as (
+                        select
+                            o.oferid,
+                            o.list_id,
+                            o.offer_info_center,
+                            o.is_deleted,
+                    
+                            ins_comp_util.get_price_plan(
+                                o.offer_info_center,
+                                ins_comp_util.get_cash_comp_code
+                            ) as plan_code
+                    
+                        from offers o
+                    
+                        where o.oferid = :P63_OFERID
+                          and o.offer_type = 0
+                          and o.offer_info_center = :G_INFO_CENTER_ID
+                    ),
+                    lov_values as (
+                        /*
+                         * Services currently eligible for a new bundle component.
+                         * Services already active on the offer are excluded.
+                         */
+                        select
+                            trim(ppd.serviceid)
+                                || ' - '
+                                || trim(s.servicedesc) as display_value,
+                    
+                            ppd.serviceid as return_value
+                    
+                        from offer_context oc
+                    
+                        join price_plan_dtl ppd
+                          on ppd.list_id = oc.list_id
+                         and ppd.plan_code = oc.plan_code
+                    
+                        join services s
+                          on s.serviceid = ppd.serviceid
+                         and s.list_id = oc.list_id
+                    
+                        where oc.is_deleted = 'N'
+                    
+                          and not exists (
+                              select 1
+                              from offers_dtl d
+                              where d.oferid = oc.oferid
+                                and d.list_id = oc.list_id
+                                and d.serviceid = ppd.serviceid
+                                and d.is_deleted = 'N'
+                          )
+                    
+                        union all
+                    
+                        /*
+                         * Resolve the display value for the existing saved row.
+                         *
+                         * ORIGINAL_SERVICEID is populated for database rows and
+                         * is null for newly inserted client-side rows.
+                         */
+                        select
+                            trim(s.serviceid)
+                                || ' - '
+                                || trim(s.servicedesc) as display_value,
+                    
+                            s.serviceid as return_value
+                    
+                        from offer_context oc
+                    
+                        join services s
+                          on s.serviceid = :ORIGINAL_SERVICEID
+                         and s.list_id = oc.list_id
+                    
+                        where :ORIGINAL_SERVICEID is not null
+                    )
+                    select
+                        display_value,
+                        return_value
+                    from lov_values
+                    order by
+                        display_value
+                    ```
+            }
+            cascadingLov {
+                parentColumns: ORIGINAL_SERVICEID
+                itemsToSubmit: P63_OFERID
+            }
+            layout {
+                sequence: 60
+            }
+            appearance {
+                width: 360
+            }
+            validation {
+                valueRequired: true
+                maxLength: 20
+            }
+            source {
+                databaseColumn: SERVICEID
+                dataType: varchar2
+            }
+            readOnly {
+                type: itemIsNotNull
+                item: ROW_ID
+                execute: forEachRow
+            }
+        )
+
+        column VAT_STATUS (
+            type: textField
+            heading {
+                heading: VAT
+                alignment: center
+            }
+            layout {
+                sequence: 160
+                columnAlignment: center
+            }
+            source {
+                databaseColumn: VAT_STATUS
+                dataType: varchar2
+            }
+            columnFilter {
+                performanceImpactingOperators: [
+                    contains
+                    startsWith
+                    caseInsensitive
+                    regexp
+                ]
+                lovType: none
+            }
+            enableUsersTo {
+                sort: false
+            }
+            advanced {
+                customAttributes: readonly="readonly" tabindex="-1"
+            }
+        )
+
+    )
+
+    region bundle-list (
+        name: Bundle List
+        type: classicReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                with q as (
+                    select
+                        o.oferid,
+                        o.offer_name,
+                        nullif(trim(o.notes), '') as description,
+                        o.start_date,
+                        o.enddate,
+                
+                        case
+                            when o.is_deleted = 'Y' then
+                            'Retired'
+                            when trunc(sysdate) < trunc(o.start_date) then
+                            'Upcoming'
+                            when trunc(sysdate) > trunc(o.enddate) then
+                            'Expired'
+                        else
+                            'Active'
+                        end as status_label,
+                 
+                        case
+                            when o.is_deleted = 'Y' then
+                                'app-badge--danger'
+                            when trunc(sysdate) < trunc(o.start_date) then
+                                'app-badge--primary'
+                            when trunc(sysdate) > trunc(o.enddate) then
+                                'app-badge--neutral'
+                            else
+                                'app-badge--success'
+                        end as status_class,
+                
+                        apex_page.get_url(
+                            p_page   => 63,
+                            p_items  => 'P63_OFERID',
+                            p_values => o.oferid
+                        ) as bundle_link,
+                
+                        case
+                            when o.oferid = :P63_OFERID then
+                                'is-active'
+                            else
+                                null
+                        end as card_class
+                
+                    from offers o
+                
+                    where o.offer_type = 0
+                      and o.offer_info_center = :G_INFO_CENTER_ID
+                
+                      and (
+                            nullif(trim(:P63_SEARCH), '') is null
+                
+                            or instr(
+                                   to_char(o.oferid),
+                                   trim(:P63_SEARCH)
+                               ) > 0
+                
+                            or instr(
+                                   upper(o.offer_name),
+                                   upper(trim(:P63_SEARCH))
+                               ) > 0
+                
+                            or instr(
+                                   upper(nvl(o.notes, '')),
+                                   upper(trim(:P63_SEARCH))
+                               ) > 0
+                          )
+                )
+                select
+                    oferid,
+                    offer_name,
+                    description,
+                    start_date,
+                    enddate,
+                    status_label,
+                    status_class,
+                    bundle_link,
+                    card_class,
+                
+                    '<a class="app-side-card ' ||
+                        apex_escape.html_attribute(card_class) ||
+                        '" href="' ||
+                        apex_escape.html_attribute(bundle_link) ||
+                        '" title="' ||
+                        apex_escape.html_attribute(
+                            'View bundled offer ' || offer_name
+                        ) ||
+                        '" aria-label="' ||
+                        apex_escape.html_attribute(
+                            'View bundled offer ' || offer_name
+                        ) ||
+                        '"' ||
+                    case
+                        when card_class = 'is-active' then
+                            ' aria-current="page"'
+                        else
+                            null
+                    end ||
+                    '>' ||
+                
+                        '<span class="app-side-card__top">' ||
+                            '<span class="app-side-card__title">' ||
+                                apex_escape.html(offer_name) ||
+                            '</span>' ||
+                        '</span>' ||
+                
+                        '<span class="app-side-card__meta">' ||
+                            'Bundle ID ' || to_char(oferid) ||
+                        '</span>' ||
+                
+                        '<span class="app-side-card__badges">' ||
+                            '<span class="app-badge ' ||
+                                apex_escape.html_attribute(status_class) ||
+                                ' app-badge--light app-badge--sm">' ||
+                                apex_escape.html(status_label) ||
+                            '</span>' ||
+                        '</span>'||
+                
+                        '<span class="app-side-card__sub">' ||
+                            apex_escape.html(
+                                nvl(description, 'No description')
+                            ) ||
+                        '</span>' ||
+                
+                    '</a>' as bundle_card
+                
+                from q
+                order by
+                    case status_label
+                        when 'Active'   then 1
+                        when 'Upcoming' then 2
+                        when 'Expired'  then 3
+                        when 'Retired'  then 4
+                        else 5
+                    end,
+                    lower(offer_name),
+                    oferid
+                ```
+            pageItemsToSubmit: [
+                P63_SEARCH
+                P63_OFERID
+            ]
+        }
+        layout {
+            sequence: 20
+            slot: REGION_POSITION_02
+        }
+        appearance {
+            template: @/blank-with-attributes-no-grid
+            templateOptions: #DEFAULT#
+            cssClasses: app-side-list
+        }
+        advanced {
+            htmlDomId: bundle_list
+        }
+        reportLayout {
+            numberOfRows: 1000
+        }
+        componentAppearance {
+            template: @/standard
+            templateOptions: [
+                #DEFAULT#
+                t-Report--staticRowColors
+                t-Report--rowHighlightOff
+                t-Report--noBorders
+            ]
+        }
+        messages {
+            whenNoDataFound:
+                ```
+                <div class="empty-state empty-state--region empty-state--image-empty-list">
+                  <h3 class="empty-state__title">No bundled offers found</h3>
+                </div>
+                ```
+        }
+
+        column BUNDLE_CARD (
+            reportColumnQueryId: 10
+            derivedColumn: N
+            heading {
+                heading: Bundle Card
+            }
+            layout {
+                sequence: 110
+            }
+            sorting {
+                sortable: false
+            }
+            security {
+                escapeSpecialChars: false
+            }
+        )
+
+        column BUNDLE_LINK (
+            reportColumnQueryId: 8
+            derivedColumn: N
+            type: hidden
+            layout {
+                sequence: 100
+            }
+        )
+
+        column CARD_CLASS (
+            reportColumnQueryId: 9
+            derivedColumn: N
+            type: hidden
+            layout {
+                sequence: 90
+            }
+        )
+
+        column DESCRIPTION (
+            reportColumnQueryId: 3
+            derivedColumn: N
+            type: hidden
+            layout {
+                sequence: 30
+            }
+        )
+
+        column ENDDATE (
+            reportColumnQueryId: 5
+            derivedColumn: N
+            type: hidden
+            layout {
+                sequence: 50
+            }
+        )
+
+        column OFERID (
+            reportColumnQueryId: 1
+            derivedColumn: N
+            type: hidden
+            layout {
+                sequence: 10
+            }
+        )
+
+        column OFFER_NAME (
+            reportColumnQueryId: 2
+            derivedColumn: N
+            type: hidden
+            layout {
+                sequence: 20
+            }
+        )
+
+        column START_DATE (
+            reportColumnQueryId: 4
+            derivedColumn: N
+            type: hidden
+            layout {
+                sequence: 40
+            }
+        )
+
+        column STATUS_CLASS (
+            reportColumnQueryId: 7
+            derivedColumn: N
+            type: hidden
+            layout {
+                sequence: 70
+            }
+        )
+
+        column STATUS_LABEL (
+            reportColumnQueryId: 6
+            derivedColumn: N
+            type: hidden
+            layout {
+                sequence: 60
+            }
+        )
+
+    )
+
+    region bundle-overview (
+        name: Bundle Overview
+        type: themeTemplateComponent/contentRow
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                select
+                    o.oferid,
+                    o.offer_name,
+                    nullif(trim(o.notes), '') as description,
+                
+                    to_char(
+                        o.start_date,
+                        :APP_NLS_DATE_FORMAT
+                    )
+                    || ' - ' ||
+                    to_char(
+                        o.enddate,
+                        :APP_NLS_DATE_FORMAT
+                    ) as effective_period,
+                
+                    case
+                        when o.valid_dayes is null then
+                            'Not set'
+                        else
+                            to_char(o.valid_dayes) || ' days'
+                    end as valid_days_display,
+                
+                    pl.list_name,
+                
+                    to_char(
+                        nvl(o.org_price, 0),
+                        'FM999G999G990D00'
+                    ) as original_total,
+                
+                    to_char(
+                        nvl(o.new_price, 0),
+                        'FM999G999G990D00'
+                    ) as bundle_total,
+                
+                    to_char(
+                        nvl(o.org_price, 0) -
+                        nvl(o.new_price, 0),
+                        'FM999G999G990D00'
+                    ) as savings,
+                
+                    case
+                        when o.last_update_date is null then
+                            nvl(trim(o.last_updated_by), 'Unknown')
+                        else
+                            nvl(trim(o.last_updated_by), 'Unknown')
+                            || ' · ' ||
+                            to_char(
+                                o.last_update_date,
+                                :APP_DATE_TIME_FORMAT
+                            )
+                    end as last_updated,
+                
+                    case
+                        when o.is_deleted = 'Y' then 'Retired'
+                        when trunc(sysdate) < trunc(o.start_date) then 'Upcoming'
+                        when trunc(sysdate) > trunc(o.enddate) then 'Expired'
+                        else 'Active'
+                    end as status_label,
+                
+                    case
+                        when o.is_deleted = 'Y' then
+                            'app-badge--destructive'
+                
+                        when trunc(sysdate) < trunc(o.start_date) then
+                            'app-badge--info'
+                
+                        when trunc(sysdate) > trunc(o.enddate) then
+                            'app-badge--secondary'
+                
+                        else
+                            'app-badge--success'
+                    end as status_class
+                
+                from offers o
+                
+                join price_list_master pl
+                  on pl.list_id = o.list_id
+                
+                where o.oferid = :P63_OFERID
+                  and o.offer_type = 0
+                  and o.offer_info_center = :G_INFO_CENTER_ID
+                ```
+            pageItemsToSubmit: P63_OFERID
+        }
+        layout {
+            sequence: 30
+            slot: regionBody
+        }
+        appearance {
+            template: @/standard
+            templateOptions: [
+                #DEFAULT#
+                t-Region--noBorder
+                t-Region--scrollBody
+            ]
+        }
+        advanced {
+            htmlDomId: bundle_overview
+        }
+        serverSideCondition {
+            type: itemIsNotNull
+            item: P63_OFERID
+        }
+        componentAppearance {
+            display: partial
+        }
+        settings {
+            overline: Bundle ID &OFERID.
+            title: &OFFER_NAME.
+            description:
+                ```html
+                <div class="bundle-overview-status">
+                    <span class="app-badge &STATUS_CLASS!ATTR. app-badge--solid app-badge--md">&STATUS_LABEL!HTML.</span>
+                </div>
+                
+                {if DESCRIPTION/}
+                <div class="bundle-overview-description">&DESCRIPTION!HTML.</div>
+                {else/}
+                <div class="bundle-overview-description bundle-overview-empty">No description provided.</div>
+                {endif/}
+                
+                <div class="bundle-overview-layout">
+                    <div class="bundle-overview-meta">
+                        <div class="bundle-overview-detail">
+                            <span class="bundle-overview-detail__label">Effective Period</span>
+                            <span class="bundle-overview-detail__value">&EFFECTIVE_PERIOD!HTML.</span>
+                        </div>
+                        <div class="bundle-overview-detail">
+                            <span class="bundle-overview-detail__label">Validity Days</span>
+                            <span class="bundle-overview-detail__value">&VALID_DAYS_DISPLAY!HTML.</span>
+                        </div>
+                        <div class="bundle-overview-detail">
+                            <span class="bundle-overview-detail__label">Price List</span>
+                            <span class="bundle-overview-detail__value bundle-overview-detail__value--accent">&LIST_NAME!HTML.</span>
+                        </div>
+                        <div class="bundle-overview-detail">
+                            <span class="bundle-overview-detail__label">Last Updated</span>
+                            <span class="bundle-overview-detail__value">&LAST_UPDATED!HTML.</span>
+                        </div>
+                    </div>
+                
+                    <div class="bundle-overview-savings">
+                        <span class="bundle-overview-savings__label">Savings</span>
+                        <div class="bundle-overview-savings__amount">
+                            &SAVINGS!HTML.<span class="bundle-overview-savings__currency">SAR</span>
+                        </div>
+                        <span class="bundle-overview-savings__sub">Difference between original and bundle totals, excluding VAT</span>
+                        <div class="bundle-overview-savings__divider"></div>
+                        <div class="bundle-overview-savings__totals">
+                            <div>
+                                <span class="bundle-overview-savings__totlabel">Original Total</span>
+                                <span class="bundle-overview-savings__strike">&ORIGINAL_TOTAL!HTML.</span>
+                            </div>
+                            <div>
+                                <span class="bundle-overview-savings__totlabel">Bundle Total</span>
+                                <span class="bundle-overview-savings__pill">&BUNDLE_TOTAL!HTML.</span>
+                            </div>
+                        </div>
+                        <div class="bundle-overview-savings__note">
+                          All amounts exclude VAT.
+                        </div>
+                    </div>
+                </div>
+                ```
+        }
+
+        column BUNDLE_TOTAL (
+            layout {
+                sequence: 120
+            }
+            source {
+                databaseColumn: BUNDLE_TOTAL
+                dataType: varchar2
+            }
+        )
+
+        column DESCRIPTION (
+            layout {
+                sequence: 30
+            }
+            source {
+                databaseColumn: DESCRIPTION
+                dataType: varchar2
+            }
+        )
+
+        column EFFECTIVE_PERIOD (
+            layout {
+                sequence: 40
+            }
+            source {
+                databaseColumn: EFFECTIVE_PERIOD
+                dataType: varchar2
+            }
+        )
+
+        column LAST_UPDATED (
+            layout {
+                sequence: 60
+            }
+            source {
+                databaseColumn: LAST_UPDATED
+                dataType: varchar2
+            }
+        )
+
+        column LIST_NAME (
+            layout {
+                sequence: 50
+            }
+            source {
+                databaseColumn: LIST_NAME
+                dataType: varchar2
+            }
+        )
+
+        column OFERID (
+            layout {
+                sequence: 10
+            }
+            source {
+                databaseColumn: OFERID
+                dataType: number
+                primaryKey: true
+            }
+        )
+
+        column OFFER_NAME (
+            layout {
+                sequence: 20
+            }
+            source {
+                databaseColumn: OFFER_NAME
+                dataType: varchar2
+            }
+        )
+
+        column ORIGINAL_TOTAL (
+            layout {
+                sequence: 150
+            }
+            source {
+                databaseColumn: ORIGINAL_TOTAL
+                dataType: varchar2
+            }
+        )
+
+        column SAVINGS (
+            layout {
+                sequence: 130
+            }
+            source {
+                databaseColumn: SAVINGS
+                dataType: varchar2
+            }
+        )
+
+        column STATUS_CLASS (
+            layout {
+                sequence: 160
+            }
+            source {
+                databaseColumn: STATUS_CLASS
+                dataType: varchar2
+            }
+        )
+
+        column STATUS_LABEL (
+            layout {
+                sequence: 80
+            }
+            source {
+                databaseColumn: STATUS_LABEL
+                dataType: varchar2
+            }
+        )
+
+        column VALID_DAYS_DISPLAY (
+            layout {
+                sequence: 100
+            }
+            source {
+                databaseColumn: VALID_DAYS_DISPLAY
+                dataType: varchar2
+            }
+        )
+
+    )
+
+    region container (
+        name: Container
+        type: staticContent
+        layout {
+            sequence: 40
+            slot: regionBody
+        }
+        appearance {
+            template: @/standard
+            templateOptions: [
+                #DEFAULT#
+                t-Region--removeHeader js-removeLandmark
+                t-Region--noBorder
+                t-Region--scrollBody
+            ]
+        }
+        serverSideCondition {
+            type: itemIsNotNull
+            item: P63_OFERID
+        }
+    )
+
+    region hidden-items (
+        name: Hidden Items
+        type: staticContent
+        layout {
+            sequence: 70
+            slot: regionBody
+        }
+    )
+
+    region no-record-selected (
+        name: Empty State
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div class="empty-state empty-state--card empty-state--image-offers">
+                  <h3 class="empty-state__title">Select a bundled offer</h3>
+                  <p class="empty-state__text">
+                    Choose a bundled offer from the left list to view its details.
+                  </p>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 60
+            slot: regionBody
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        serverSideCondition {
+            type: itemIsNull
+            item: P63_OFERID
+        }
+    )
+
+    region offers (
+        name: Title
+        title: Bundled Offers
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: regionBody
+        }
+        appearance {
+            template: @/title-bar
+            templateOptions: [
+                #DEFAULT#
+                t-BreadcrumbRegion--useRegionTitle
+            ]
+        }
+    )
+
+    region search (
+        name: Bundle Search
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: REGION_POSITION_02
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: [
+                #DEFAULT#
+                t-Form--stretchInputs
+                margin-top-none
+                margin-bottom-none
+                margin-left-none
+                margin-right-none
+            ]
+            cssClasses: app-side-search
+        }
+    )
+
+    pageItem P63_BUNDLE_RETIRED (
+        type: hidden
+        layout {
+            sequence: 50
+            region: @hidden-items
+            slot: regionBody
+        }
+    )
+
+    pageItem P63_OFERID (
+        type: hidden
+        settings {
+            valueProtected: false
+        }
+        layout {
+            sequence: 40
+            region: @hidden-items
+            slot: regionBody
+        }
+    )
+
+    pageItem P63_SEARCH (
+        type: textField
+        label {
+            label: Search
+            alignment: left
+        }
+        layout {
+            sequence: 10
+            region: @search
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/hidden
+            templateOptions: [
+                #DEFAULT#
+                t-Form-fieldContainer--large
+                t-Form-fieldContainer--postTextBlock
+            ]
+            icon: fa-solid fa-search
+            width: 30
+            valuePlaceholder: Search bundled offers...
+        }
+        advanced {
+            warnOnUnsavedChanges: ignore
+        }
+    )
+
+    button create (
+        buttonName: CREATE
+        label: Create
+        layout {
+            sequence: 10
+            region: @breadcrumb
+            slot: CREATE
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+            icon: fa-plus
+        }
+        behavior {
+            action: redirectThisApp
+            target: {
+                page: 64
+                clearCache: 64
+                action: resetPagination
+            }
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression: fnd_app_security.has_permission('BILLING_BUNDLED_OFFERS_CREATE') = 'TRUE'
+        }
+    )
+
+    button edit (
+        buttonName: MANAGE_BUNDLE
+        label: Manage Bundle
+        layout {
+            sequence: 20
+            region: @bundle-overview
+            slot: EDIT
+        }
+        appearance {
+            buttonTemplate: @/icon
+            templateOptions: [
+                #DEFAULT#
+                t-Button--noUI
+            ]
+            icon: fa-solid fa-edit
+        }
+        behavior {
+            action: redirectThisApp
+            target: {
+                page: 64
+                items: {
+                    P64_OFERID: &P63_OFERID.
+                }
+                clearCache: 64
+                action: resetPagination
+            }
+        }
+        advanced {
+            htmlDomId: manage_bundle_btn
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P63_OFERID is not null
+                and (
+                       fnd_app_security.has_permission(
+                           'BILLING_BUNDLED_OFFERS_UPDATE'
+                       ) = 'TRUE'
+                    or fnd_app_security.has_permission(
+                           'BILLING_BUNDLED_OFFERS_RETIRE'
+                       ) = 'TRUE'
+                )
+                and nvl(:P63_BUNDLE_RETIRED, 'N') = 'N'
+                ```
+        }
+    )
+
+    button reset (
+        buttonName: RESET
+        label: Clear Selection & Search
+        layout {
+            sequence: 10
+            region: @breadcrumb
+            slot: PREVIOUS
+        }
+        appearance {
+            buttonTemplate: @/text-with-icon
+            templateOptions: [
+                #DEFAULT#
+                t-Button--noUI
+                t-Button--iconLeft
+                t-Button--gapRight
+            ]
+            icon: fa-solid fa-undo-alt
+        }
+        behavior {
+            action: redirectThisApp
+            target: {
+                page: 63
+                clearCache: 63
+                action: resetPagination
+                request: RESET
+            }
+        }
+    )
+
+    dynamicAction perform-search (
+        name: Perform Search
+        execution {
+            sequence: 150
+        }
+        when {
+            event: keypress
+            selectionType: items
+            items: P63_SEARCH
+        }
+        clientSideCondition {
+            type: item=value
+            item: JAVASCRIPT_EXPRESSION
+            value: this.browserEvent.which === apex.jQuery.ui.keyCode.ENTER
+        }
+
+        action native-cancel-event (
+            action: cancelEvent
+            execution {
+                sequence: 50
+                fireOnInit: false
+            }
+        )
+
+        action native-javascript-code (
+            action: executeJsCode
+            settings {
+                jsCode: window.p63BundleSearch.refreshNow();
+            }
+            execution {
+                sequence: 40
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    dynamicAction refresh-after-create (
+        name: Refresh After Bundle Create
+        execution {
+            sequence: 180
+        }
+        when {
+            event: apexafterclosedialog
+            selectionType: region
+            region: @breadcrumb
+        }
+
+        action native-javascript-code (
+            action: executeJsCode
+            settings {
+                jsCode:
+                    ```javascript-browser
+                    const newOfferId =
+                        this.data &&
+                        this.data.P64_OFERID;
+                    
+                    if (!newOfferId) {
+                        return;
+                    }
+                    
+                    if (apex.page.isChanged()) {
+                        const offerListRegion =
+                            apex.region("bundle_list")
+                    
+                        if (offerListRegion) {
+                            offerListRegion.refresh();
+                        }
+                    
+                        apex.message.alert(
+                            "The new bundled offer was created, but it was not selected because this page has unsaved changes. Save or discard the current changes, then select the new bundled offer from the list."
+                        );
+                    
+                        return;
+                    }
+                    
+                    apex.item("P63_OFERID").setValue(
+                        newOfferId
+                    );
+                    
+                    apex.page.submit({
+                        request: "SELECT_CREATED_OFFER",
+                        showWait: true
+                    });
+                    ```
+            }
+            execution {
+                sequence: 40
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    dynamicAction refresh-after-update (
+        name: Refresh After Bundle Update
+        execution {
+            sequence: 170
+        }
+        when {
+            event: apexafterclosedialog
+            selectionType: region
+            region: @bundle-overview
+        }
+
+        action native-execute-plsql-code (
+            action: executeServerSideCode
+            settings {
+                plsqlCode:
+                    ```plsql
+                    begin
+                        :P63_BUNDLE_RETIRED := null;
+                    
+                        if :P63_OFERID is not null then
+                            select case
+                                       when o.is_deleted = 'Y' then 'Y'
+                                       else 'N'
+                                   end
+                              into :P63_BUNDLE_RETIRED
+                              from offers o
+                             where o.oferid = :P63_OFERID
+                               and o.offer_type = 0
+                               and o.offer_info_center = :G_INFO_CENTER_ID;
+                        end if;
+                    
+                    exception
+                        when no_data_found then
+                            :P63_OFERID         := null;
+                            :P63_BUNDLE_RETIRED := null;
+                    end;
+                    ```
+                itemsToSubmit: P63_OFERID
+                itemsToReturn: [
+                    P63_OFERID
+                    P63_BUNDLE_RETIRED
+                ]
+            }
+            execution {
+                sequence: 10
+                fireOnInit: false
+            }
+        )
+
+        action native-refresh (
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @bundle-list
+            }
+            execution {
+                sequence: 20
+                fireOnInit: false
+            }
+        )
+
+        action native-refresh_1 (
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @bundle-components
+            }
+            execution {
+                sequence: 40
+                fireOnInit: false
+            }
+            clientSideCondition {
+                type: item=value
+                item: P63_BUNDLE_RETIRED
+                value: Y
+            }
+        )
+
+        action native-refresh_2 (
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @bundle-overview
+            }
+            execution {
+                sequence: 30
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    dynamicAction refresh-bundle-totals-after-save (
+        name: Refresh Bundle Totals After Save
+        execution {
+            sequence: 220
+        }
+        when {
+            event: region/interactiveGrid/interactivegridsave
+            selectionType: region
+            region: @bundle-components
+        }
+
+        action native-refresh (
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @bundle-overview
+            }
+            execution {
+                sequence: 10
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    dynamicAction search-offers (
+        name: Search Bundled Offers
+        execution {
+            sequence: 160
+        }
+        when {
+            event: input
+            selectionType: items
+            items: P63_SEARCH
+        }
+
+        action native-javascript-code (
+            action: executeJsCode
+            settings {
+                jsCode: window.p63BundleSearch.refreshDebounced();
+            }
+            execution {
+                sequence: 10
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    dynamicAction service-pricing-changed (
+        name: Bundle Component Pricing Changed
+        execution {
+            sequence: 190
+            eventScope: dynamic
+        }
+        when {
+            selectionType: columns
+            interactiveGrid: @bundle-components
+            columns: [
+                SERVICEID
+                QTY
+                OFFER_PRICE
+            ]
+        }
+
+        action native-execute-plsql-code (
+            action: executeServerSideCode
+            settings {
+                plsqlCode:
+                    ```plsql
+                    declare
+                        l_org_price
+                            offers_dtl.org_price%type;
+                    
+                        l_ignored_org_discount
+                            offers_dtl.org_disc%type;
+                    
+                        l_vat_rate
+                            services.vat_rate%type;
+                    
+                        l_qty
+                            number;
+                    
+                        l_bundle_unit_price
+                            number;
+                    
+                        l_original_line_total
+                            number;
+                    
+                        l_bundle_line_total
+                            number;
+                    begin
+                        if :SERVICEID is null then
+                            :ORG_PRICE           := null;
+                            :VAT_STATUS          := null;
+                            :ORIGINAL_LINE_TOTAL := null;
+                            :BUNDLE_LINE_TOTAL   := null;
+                            :SAVINGS             := null;
+                    
+                            return;
+                        end if;
+                    
+                        bil_offers_admin.get_bundle_component_pricing(
+                            p_offer_id       => :P63_OFERID,
+                            p_service_id     => :SERVICEID,
+                            o_org_price      => l_org_price,
+                            o_org_discount   => l_ignored_org_discount,
+                            o_vat_rate       => l_vat_rate
+                        );
+                    
+                        :ORG_PRICE :=
+                            l_org_price;
+                    
+                        :VAT_STATUS :=
+                            case
+                                when l_vat_rate is null then
+                                    'Exempt'
+                                else
+                                    to_char(
+                                        l_vat_rate,
+                                        'TM9'
+                                    ) || '% VAT'
+                            end;
+                    
+                        l_qty :=
+                            nvl(
+                                to_number(
+                                    :QTY,
+                                    '999G999G990D00'
+                                ),
+                                1
+                            );
+                    
+                        l_original_line_total :=
+                            round(
+                                l_qty * nvl(l_org_price, 0),
+                                2
+                            );
+                    
+                        :ORIGINAL_LINE_TOTAL :=
+                            l_original_line_total;
+                    
+                        if :OFFER_PRICE is null then
+                            :BUNDLE_LINE_TOTAL := null;
+                            :SAVINGS           := null;
+                        else
+                            l_bundle_unit_price :=
+                                to_number(
+                                    :OFFER_PRICE,
+                                    '999G999G990D00'
+                                );
+                    
+                            l_bundle_line_total :=
+                                round(
+                                    l_qty * l_bundle_unit_price,
+                                    2
+                                );
+                    
+                            :BUNDLE_LINE_TOTAL :=
+                                l_bundle_line_total;
+                    
+                            :SAVINGS :=
+                                round(
+                                    l_original_line_total -
+                                    l_bundle_line_total,
+                                    2
+                                );
+                        end if;
+                    end;
+                    ```
+                itemsToSubmit: [
+                    P63_OFERID
+                    SERVICEID
+                    QTY
+                    OFFER_PRICE
+                ]
+                itemsToReturn: [
+                    ORG_PRICE
+                    VAT_STATUS
+                    ORIGINAL_LINE_TOTAL
+                    BUNDLE_LINE_TOTAL
+                    SAVINGS
+                ]
+                showProcessing: true
+            }
+            execution {
+                sequence: 20
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    validation offer-price-cannot-be-negative (
+        name: Bundle Components - Bundle price must not exceed original price
+        execution {
+            sequence: 10
+        }
+        validation {
+            editableRegion: @bundle-components
+            plsqlExpression:
+                ```plsql
+                :OFFER_PRICE is not null
+                and :ORG_PRICE is not null
+                and to_number(
+                        :OFFER_PRICE,
+                        '999G999G990D00'
+                    ) >= 0
+                and to_number(
+                        :OFFER_PRICE,
+                        '999G999G990D00'
+                    )
+                    <=
+                    to_number(
+                        :ORG_PRICE,
+                        '999G999G990D00'
+                    )
+                ```
+        }
+        error {
+            errorMessage: Bundle Unit Price must be between 0 and Plan Unit Price.
+            associatedColumn: OFFER_PRICE
+        }
+    )
+
+    validation quantity-can-not-be-negative (
+        name: Bundle Components - Quantity must be a positive integer
+        execution {
+            sequence: 50
+        }
+        validation {
+            editableRegion: @bundle-components
+            plsqlExpression:
+                ```plsql
+                :QTY is not null
+                and :QTY between 1 and 999
+                and :QTY = trunc(:QTY)
+                ```
+        }
+        error {
+            errorMessage: Quantity must be a whole number between 1 and 999.
+            associatedColumn: QTY
+        }
+    )
+
+    validation saved-service-cannot-be-changed (
+        name: Saved Service Cannot Be Changed
+        execution {
+            sequence: 40
+        }
+        validation {
+            editableRegion: @bundle-components
+            plsqlExpression:
+                ```plsql
+                :ROW_ID is null
+                or :SERVICEID = :ORIGINAL_SERVICEID
+                ```
+        }
+        error {
+            errorMessage: A saved bundle component service cannot be changed. Remove the component and add the correct service.
+            associatedColumn: SERVICEID
+        }
+    )
+
+    process new (
+        name: Resolve Selected Bundle Status
+        type: executeCode
+        source {
+            plsqlCode:
+                ```plsql
+                begin
+                    :P63_BUNDLE_RETIRED := null;
+                
+                    if :P63_OFERID is not null then
+                        select case
+                                   when o.is_deleted = 'Y' then 'Y'
+                                   else 'N'
+                               end
+                          into :P63_BUNDLE_RETIRED
+                          from offers o
+                         where o.oferid = :P63_OFERID
+                           and o.offer_type = 0
+                           and o.offer_info_center = :G_INFO_CENTER_ID;
+                    end if;
+                
+                exception
+                    when no_data_found then
+                        :P63_OFERID         := null;
+                        :P63_BUNDLE_RETIRED := null;
+                end;
+                ```
+        }
+        execution {
+            sequence: 10
+            point: beforeHeader
+        }
+        advanced {
+            executionMappingIdentifier: 41632836074840462
+        }
+    )
+
+    process save-offer-service-lines (
+        name: Save Bundle Components
+        type: executeCode
+        editableRegion: @bundle-components
+        source {
+            plsqlCode:
+                ```plsql
+                declare
+                    l_expected_detail_ovn offers_dtl.object_version_number%type;
+                    l_header_ovn          offers.object_version_number%type;
+                begin
+                    case :APEX$ROW_STATUS
+                
+                        when 'C' then
+                            bil_offers_admin.add_bundle_component(
+                                p_offer_id     => :P63_OFERID,
+                                p_service_id   => :SERVICEID,
+                                p_quantity     => :QTY,
+                                p_bundle_price => :OFFER_PRICE,
+                                o_row_id       => :ROW_ID,
+                                o_detail_ovn   => :OBJECT_VERSION_NUMBER,
+                                o_header_ovn   => l_header_ovn
+                            );
+                
+                        when 'U' then
+                            l_expected_detail_ovn :=
+                                :OBJECT_VERSION_NUMBER;
+                
+                            bil_offers_admin.update_bundle_component(
+                                p_offer_id            => :P63_OFERID,
+                                p_row_id              => :ROW_ID,
+                                p_quantity            => :QTY,
+                                p_bundle_price        => :OFFER_PRICE,
+                                p_expected_detail_ovn => l_expected_detail_ovn,
+                                o_detail_ovn          => :OBJECT_VERSION_NUMBER,
+                                o_header_ovn          => l_header_ovn
+                            );
+                
+                        when 'D' then
+                            bil_offers_admin.remove_bundle_component(
+                                p_offer_id            => :P63_OFERID,
+                                p_row_id              => :ROW_ID,
+                                p_expected_detail_ovn => :OBJECT_VERSION_NUMBER,
+                                o_header_ovn          => l_header_ovn
+                            );
+                
+                    end case;
+                end;
+                ```
+        }
+        execution {
+            sequence: 10
+        }
+        advanced {
+            executionMappingIdentifier: 41618792442840415
+        }
+        serverSideCondition {
+            executionScope: allSubmittedRows
+        }
+        security {
+            authorizationScheme: @can-manage-bundled-offers-lines
+        }
+    )
+
+)
+
