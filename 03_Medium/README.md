@@ -8,7 +8,7 @@ Provides maintenance of discount packages and offers by defining the offer heade
 
 **Medium**
 
-This Form represents a master-detail configuration workflow with multiple data blocks, embedded pricing logic, a service-selection LOV, detail-row calculations, and dependencies on the pricing and insurance-network configuration.
+This Form represents a master-detail configuration workflow with multiple data blocks, embedded pricing logic, a service-selection LOV, detail-row calculations, and dependencies on pricing and insurance-network configuration.
 
 ## Main Functionality
 
@@ -37,11 +37,13 @@ This Form represents a master-detail configuration workflow with multiple data b
 | DB Packages    |     0 |
 | Report Objects |     0 |
 
+These counts describe the legacy Oracle Forms module only. The migrated APEX reference implementation and its related backend components are documented separately under `APEX_Reference/`.
+
 The Form contains:
 
-* `OFFERS` — master database block
-* `OFFERS_DTL` — detail database block containing the services included in the offer
-* `TOOLS` — non-database utility block
+* `OFFERS` - master database block
+* `OFFERS_DTL` - detail database block containing the services included in the offer
+* `TOOLS` - non-database utility block
 
 The master-detail relationship is defined by `OFFERS_OFFERS_DTL`.
 
@@ -105,7 +107,7 @@ The legacy implementation generates identifiers using `MAX(...) + 1` patterns fo
 * Shared Forms Object Library dependencies
 * No report objects
 
-## Dependencies
+## Legacy Dependencies
 
 ### Database Packages
 
@@ -115,8 +117,8 @@ No direct Oracle database package dependencies in the Form.
 
 The Form references shared standalone database functionality including:
 
-* `GetVersion` — used when initializing the Forms application window
-* `GET_U_PREV20` — referenced by the shared `CHK_SEC` program unit for legacy operation-level security
+* `GetVersion` - used when initializing the Forms application window
+* `GET_U_PREV20` - referenced by the shared `CHK_SEC` program unit for legacy operation-level security
 
 These are not counted in the `DB Packages` value because they are standalone database functions rather than package calls.
 
@@ -150,7 +152,7 @@ The relationship joins the detail block to the offer header using:
 * `LIST_ID`
 * `OFERID`
 
-The legacy Forms relation automatically coordinates detail queries and prevents masterless detail operations.
+The Forms relation coordinates detail queries and prevents masterless detail operations.
 
 ### Other Forms
 
@@ -158,7 +160,7 @@ No significant cross-Form dependency.
 
 ### Reports
 
-No report objects or report execution dependencies.
+No report dependencies.
 
 ### Shared Forms Libraries
 
@@ -170,26 +172,44 @@ The Form references shared Oracle Forms Object Libraries including:
 
 These libraries provide shared visual, interface, alert, and application behavior used by the legacy Forms application.
 
-## Migration Considerations
+## APEX Reference Implementation
 
-The functionality maps well to an Oracle APEX master-detail or parent/child maintenance interface, but several parts of the existing Forms implementation should be redesigned rather than reproduced directly.
+This sample has already been successfully migrated to Oracle APEX.
 
-During migration:
+The completed reference implementation is available under `APEX_Reference/` and includes:
 
-* The `OFFERS` and `OFFERS_DTL` relationship should be implemented using normal database foreign-key relationships and an appropriate APEX master-detail interface.
-* `OFERID` and detail `ROW_ID` generation should not retain the legacy `MAX(...) + 1` implementation. Sequences, identity columns, or centralized database APIs should be used instead.
-* Price-list determination should be centralized in reusable database logic rather than duplicated in page-level processing.
-* Normal service price, discount, and offer-price calculations should have clearly defined server-side rules so that pricing cannot depend only on client-side page state.
-* Package totals should be recalculated and validated on the server before saving.
-* Referential integrity between offer headers and detail rows should be enforced by database constraints rather than relying on Forms master-detail triggers.
-* Deletion rules should be enforced transaction-safely in the database.
-* Service selection can be implemented using an APEX LOV or search dialog backed by the appropriate price-list query.
-* Legacy Forms-generated coordination units such as `QUERY_MASTER_DETAILS`, `CLEAR_ALL_MASTER_DETAILS`, and `CHECK_PACKAGE_FAILURE` do not need direct equivalents in APEX.
-* Shared Forms visual and window-management behavior does not need to be reproduced where native APEX functionality provides an equivalent user experience.
-* Legacy localization logic associated with the `TRANS` table should be reviewed and retained only if still required by the target application.
+* Oracle APEX Page 63 - **Bundled Offers**
+* Oracle APEX Page 64 - **Manage Bundled Offer**
+* A migration reference extract of `BIL_OFFERS_ADMIN`
+* Screenshots covering the main bundle page, empty state, and maintenance dialog
+* A dedicated README describing the migrated architecture and modernization approach
+
+The migration did not reproduce the Oracle Forms master-detail screen one-to-one. The original workflow was redesigned as a bundle-management workspace with a separate modal page for bundle-header maintenance.
+
+Key changes include:
+
+* Page 63 provides a searchable bundled-offer list, selected bundle overview, financial totals, savings presentation, and component maintenance.
+* Bundle components are maintained through an APEX Interactive Grid rather than a Forms detail block.
+* Page 64 provides focused create, update, and retirement actions for the bundle header.
+* Header and component business operations are delegated to `BIL_OFFERS_ADMIN` rather than implemented as direct page DML.
+* The backend resolves service pricing from the applicable cash price-list context and validates pricing on the server.
+* Bundle totals are recalculated server-side after component changes.
+* `OBJECT_VERSION_NUMBER` is used for optimistic locking on headers and detail rows.
+* Bundle retirement uses logical deletion behavior and also retires active components.
+* Bundle and component operations are scoped to the current information center.
+* Authorization uses centralized application permissions for bundle creation, update, retirement, and component maintenance.
+* The legacy `MAX(...) + 1` identifier-generation approach is no longer used by the APEX workflow.
+* Forms-specific master-detail coordination and window behavior were replaced with native APEX interaction patterns.
+
+The backend file under `APEX_Reference/backend/` is intentionally limited to the bundled-offer operations used by this sample and the private helpers those operations require. Unrelated functionality from the production package is not included.
+
+The APEX implementation is provided as a reference for the expected migration approach and quality level. It is not intended to prescribe an exact one-to-one design for other Forms.
+
+See [`APEX_Reference/README.md`](APEX_Reference/README.md) for details of the migrated implementation.
 
 ## Files
 
-* `disc_packages.fmb` — Original Oracle Forms module
-* `disc_packages.xml` — XML export for source inspection and analysis
-* `screenshot.png` — Screenshot of the current Oracle Forms user interface
+* `disc_packages.fmb` - Original Oracle Forms module
+* `disc_packages.xml` - XML export of the Oracle Forms module
+* `screenshot.png` - Screenshot of the current Oracle Forms user interface
+* `APEX_Reference/` - Completed Oracle APEX reference implementation, page exports, backend reference extract, screenshots, and migration notes
