@@ -41,7 +41,7 @@ System nationalities are protected from normal maintenance actions. Their edit a
 
 The status-change workflow also validates the rule in the server-side AJAX process before performing the update.
 
-The report uses the shared application report-control stylesheet rather than page-specific status-toggle CSS.
+The report uses the shared application CSS stylesheet.
 
 ### Page 25 - Manage Nationality
 
