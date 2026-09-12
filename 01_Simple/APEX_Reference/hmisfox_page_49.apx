@@ -1,0 +1,503 @@
+page 49 (
+    name: Start Cashier Shift
+    alias: START-CASHIER-SHIFT
+    title: Start Cashier Shift
+    pageGroup: @billing
+    appearance {
+        pageMode: modalDialog
+        dialogTemplate: @/modal-dialog
+        templateOptions: #DEFAULT#
+    }
+    dialog {
+        chained: false
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+    javaScript {
+        executeWhenPageLoads:
+            ```javascript-browser
+            apex.jQuery(function () {
+              const alertEl = document.querySelector(".cashier-shift-active-alert");
+              const durationEl = document.getElementById("p49_shift_duration");
+            
+              if (!alertEl || !durationEl || !alertEl.dataset.openedAt || !alertEl.dataset.serverNow) {
+                return;
+              }
+            
+              function parseApexDate(value) {
+                const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})$/);
+            
+                if (!match) {
+                  return null;
+                }
+            
+                return new Date(
+                  Number(match[1]),
+                  Number(match[2]) - 1,
+                  Number(match[3]),
+                  Number(match[4]),
+                  Number(match[5]),
+                  Number(match[6])
+                );
+              }
+            
+              const startedAt = parseApexDate(alertEl.dataset.openedAt);
+              const serverNow = parseApexDate(alertEl.dataset.serverNow);
+            
+              if (
+                !startedAt ||
+                !serverNow ||
+                Number.isNaN(startedAt.getTime()) ||
+                Number.isNaN(serverNow.getTime())
+              ) {
+                durationEl.textContent = "";
+                return;
+              }
+            
+              const initialElapsedSeconds = Math.max(
+                0,
+                Math.floor((serverNow.getTime() - startedAt.getTime()) / 1000)
+              );
+              const clientLoadedAt = Date.now();
+            
+              function renderDuration() {
+                const totalSeconds =
+                  initialElapsedSeconds +
+                  Math.max(0, Math.floor((Date.now() - clientLoadedAt) / 1000));
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+            
+                durationEl.textContent =
+                  String(hours).padStart(2, "0") + ":" +
+                  String(minutes).padStart(2, "0") + ":" +
+                  String(seconds).padStart(2, "0");
+              }
+            
+              renderDuration();
+              setInterval(renderDuration, 1000);
+            });
+            ```
+    }
+    css {
+        inline:
+            ```css
+            .cashier-shift-active-alert {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              text-align: center;
+              padding: 22px 24px 20px;
+              background: #16a34a;
+              border-radius: 14px;
+              border: none;
+              gap: 10px;
+            }
+            
+            .cashier-shift-active-title {
+              font-size: 15px;
+              font-weight: 500;
+              color: #fff;
+              margin: 0;
+            }
+            
+            .cashier-shift-active-meta {
+              font-size: 12px;
+              color: rgba(255, 255, 255, 0.75);
+              margin: 0;
+            }
+            
+            .cashier-shift-active-meta strong {
+              color: #fff;
+              font-weight: 500;
+            }
+            
+            .cashier-shift-active-timer {
+              font-size: 28px;
+              font-weight: 500;
+              color: #fff;
+              letter-spacing: 0.04em;
+              font-variant-numeric: tabular-nums;
+              margin: 2px 0 0;
+            }
+            ```
+    }
+    security {
+        authorizationScheme: @has-permission
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+    }
+
+    region active-shift-alert (
+        name: Active Shift Alert
+        type: staticContent
+        source {
+            htmlCode:
+                ```html
+                <div class="cashier-shift-active-alert" data-opened-at="&P49_OPENED_AT!ATTR." data-server-now="&P49_SERVER_NOW!ATTR.">
+                  <p class="cashier-shift-active-title">You have an active cashier shift</p>
+                  <p class="cashier-shift-active-meta">
+                    Shift <strong>#&P49_SHIFT_SYSTEM_UNIQUE.</strong>
+                    &nbsp;·&nbsp;
+                    Started at <strong>&P49_OPENED_AT_DISPLAY.</strong>
+                  </p>
+                  <div class="cashier-shift-active-timer" id="p49_shift_duration">
+                  </div>
+                </div>
+                ```
+        }
+        layout {
+            sequence: 30
+            slot: regionBody
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+        serverSideCondition {
+            type: itemIsNotNull
+            item: P49_SHIFT_SYSTEM_UNIQUE
+        }
+    )
+
+    region buttons (
+        name: Buttons
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: REGION_POSITION_03
+        }
+        appearance {
+            template: @/buttons-container
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region hidden-items (
+        name: Hidden Items
+        type: staticContent
+        layout {
+            sequence: 40
+            slot: regionBody
+        }
+    )
+
+    pageItem P49_OPENED_AT (
+        type: hidden
+        layout {
+            sequence: 30
+            region: @hidden-items
+            slot: regionBody
+        }
+        appearance {
+            formatMask: YYYY-MM-DD"T"HH24:MI:SS
+        }
+        sessionState {
+            storage: request
+        }
+    )
+
+    pageItem P49_OPENED_AT_DISPLAY (
+        type: hidden
+        layout {
+            sequence: 60
+            region: @hidden-items
+            slot: regionBody
+        }
+        sessionState {
+            storage: request
+        }
+    )
+
+    pageItem P49_SERVER_NOW (
+        type: hidden
+        layout {
+            sequence: 70
+            region: @hidden-items
+            slot: regionBody
+        }
+    )
+
+    pageItem P49_SHIFT_SYSTEM_UNIQUE (
+        type: hidden
+        layout {
+            sequence: 10
+            region: @hidden-items
+            slot: regionBody
+        }
+        sessionState {
+            storage: request
+        }
+    )
+
+    pageItem P49_STARTING_CASH (
+        type: numberField
+        label {
+            label: Starting Cash
+            alignment: left
+        }
+        settings {
+            minValue: 0
+        }
+        layout {
+            sequence: 20
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            formatMask: 999G999G999G999G990D00
+            width: 30
+        }
+        validation {
+            valueRequired: true
+        }
+        default {
+            type: static
+            staticValue: 0
+        }
+        serverSideCondition {
+            type: itemIsNull
+            item: P49_SHIFT_SYSTEM_UNIQUE
+        }
+        help {
+            helpText: Enter the cash physically available in the drawer before starting the shift.
+        }
+    )
+
+    button cancel (
+        buttonName: CANCEL
+        label: Cancel
+        layout {
+            sequence: 10
+            region: @buttons
+            slot: CLOSE
+        }
+        appearance {
+            buttonTemplate: @/text
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: triggerAction
+            executeValidations: false
+        }
+
+        triggerAction native-dialog-close (
+            action: cancelDialog
+            execution {
+                sequence: 10
+            }
+        )
+
+    )
+
+    button start-shift (
+        buttonName: START_SHIFT
+        label: Start Shift
+        layout {
+            sequence: 10
+            region: @buttons
+            slot: CREATE
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            showProcessing: true
+            warnOnUnsavedChanges: doNotCheck
+        }
+        serverSideCondition {
+            type: itemIsNull
+            item: P49_SHIFT_SYSTEM_UNIQUE
+        }
+    )
+
+    validation session-info-center-is-required (
+        name: Session info center is required
+        execution {
+            sequence: 20
+        }
+        validation {
+            type: functionBodyReturningBoolean
+            plsqlFunctionBody: return :G_INFO_CENTER_ID is not null;
+        }
+        error {
+            errorMessage: Info center is missing from your session. Please sign out and sign in again, or contact the application administrator.
+        }
+        serverSideCondition {
+            whenButtonPressed: @start-shift
+        }
+    )
+
+    validation starting-cash-cannot-be-negative (
+        name: Starting Cash cannot be negative
+        execution {
+            sequence: 30
+        }
+        validation {
+            type: functionBodyReturningBoolean
+            plsqlFunctionBody: return :P49_STARTING_CASH >= 0;
+        }
+        error {
+            errorMessage: Starting Cash cannot be negative.
+            associatedItem: @P49_STARTING_CASH
+        }
+    )
+
+    validation starting-cash-is-required (
+        name: Starting Cash is required
+        execution {
+            sequence: 10
+        }
+        validation {
+            type: itemIsNotNull
+            item: P49_STARTING_CASH
+        }
+        error {
+            errorMessage: Starting Cash is required
+            associatedItem: @P49_STARTING_CASH
+        }
+        serverSideCondition {
+            whenButtonPressed: @start-shift
+        }
+    )
+
+    process check-existing-open-shift (
+        name: Check Existing Open Shift
+        type: executeCode
+        source {
+            plsqlCode:
+                ```plsql
+                declare
+                  l_opened_at timestamp;
+                  l_minutes   number;
+                begin
+                  :P49_SHIFT_SYSTEM_UNIQUE := null;
+                  :P49_OPENED_AT := null;
+                
+                  select cs.shift_system_unique,
+                         cs.opened_at
+                    into :P49_SHIFT_SYSTEM_UNIQUE,
+                         l_opened_at
+                    from cashier_shift cs
+                   where cs.user_no = :G_USER_ID
+                     and cs.shift_status = 2
+                   fetch first 1 row only;
+                
+                  :P49_OPENED_AT := to_char(l_opened_at, 'YYYY-MM-DD"T"HH24:MI:SS');
+                  :P49_OPENED_AT_DISPLAY := to_char(l_opened_at, 'DD Mon YYYY, HH12:MI AM');
+                  :P49_SERVER_NOW := to_char(cast(systimestamp as timestamp), 'YYYY-MM-DD"T"HH24:MI:SS');
+                
+                exception
+                  when no_data_found then
+                    null;
+                end;
+                ```
+        }
+        execution {
+            sequence: 10
+            point: beforeHeader
+        }
+        advanced {
+            executionMappingIdentifier: 12038575863981245
+        }
+    )
+
+    process close (
+        name: Close
+        type: closeDialog
+        execution {
+            sequence: 20
+        }
+        advanced {
+            executionMappingIdentifier: 12038477669981244
+        }
+        serverSideCondition {
+            whenButtonPressed: @start-shift
+        }
+    )
+
+    process start-cashier-shift (
+        name: Start Cashier Shift
+        type: invokeApi
+        invoke {
+            package: BIL_CASHIER_SHIFT
+            procedureOrFunction: START_SHIFT
+        }
+        execution {
+            sequence: 10
+        }
+        successMessage {
+            successMessage: Cashier shift started successfully.
+        }
+        error {
+            errorMessage: Unable to start cashier shift. Please review the entered cash amount and try again.
+        }
+        advanced {
+            executionMappingIdentifier: 12037967117981239
+        }
+        serverSideCondition {
+            whenButtonPressed: @start-shift
+        }
+
+        parameter o_shift_system_unique (
+            parameter {
+                direction: out
+                dataType: number
+            }
+            value {
+                item: P49_SHIFT_SYSTEM_UNIQUE
+            }
+            advanced {
+                displaySequence: 20
+            }
+        )
+
+        parameter p_cash_at_begin (
+            parameter {
+                dataType: number
+            }
+            value {
+                type: item
+                item: P49_STARTING_CASH
+            }
+            advanced {
+                displaySequence: 10
+            }
+        )
+
+        parameter p_info_center_id (
+            parameter {
+                hasDefault: true
+            }
+            value {
+                type: item
+                item: G_INFO_CENTER_ID
+            }
+            advanced {
+                displaySequence: 40
+            }
+        )
+
+        parameter p_user_no (
+            parameter {
+                dataType: number
+                hasDefault: true
+            }
+            value {
+                type: item
+                item: G_USER_ID
+            }
+            advanced {
+                displaySequence: 30
+            }
+        )
+
+    )
+
+)
+
