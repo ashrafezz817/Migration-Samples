@@ -85,7 +85,7 @@ The 119 Forms triggers are distributed across item, block, and Form scope:
 * 13 block-level triggers
 * 9 Form-level triggers
 
-The Form contains 20 Program Unit objects representing 18 distinct program-unit names because legacy duplicate definitions of `CHK_VOL` and `CHK_SEC` remain in the XML.
+The Form contains 20 Program Unit objects representing 18 distinct program-unit names because legacy duplicate definitions of `CHK_VOL` and `CHK_SEC` remain in the form.
 
 ## Main Database Objects
 
@@ -352,7 +352,7 @@ The form contains 20 Program Unit objects:
 * `FINAL_CHECK`
 * `COLLECT_NAME`
 
-`CHK_VOL` and `CHK_SEC` each have duplicate XML Program Unit definitions, so the structural count is 20 even though there are 18 distinct names.
+`CHK_VOL` and `CHK_SEC` each have duplicate form Program Unit definitions, so the structural count is 20 even though there are 18 distinct names.
 
 Some of these units represent business rules while others provide shared Forms UI, security, localization, or legacy integration functionality.
 
@@ -495,19 +495,7 @@ Used to generate patient-card output.
 
 A consent-report URL is generated during patient processing and stored in the patient consent command field.
 
-A newer consent workflow also opens the `MEDICAL_CONSENT` Form, while older direct consent-report logic remains in the XML.
-
-### Legacy Report Object Reference
-
-The Form contains legacy code that calls:
-
-`FIND_REPORT_OBJECT('REPORT568')`
-
-and uses `RUN_REPORT_OBJECT` / `REPORT_OBJECT_STATUS`.
-
-However, there is no corresponding `<Report Name="REPORT568">` object in the current XML.
-
-This should therefore be treated as a legacy report dependency/reference rather than as a structural Forms Report object.
+A newer consent workflow also opens the `MEDICAL_CONSENT` Form, while older direct consent-report logic remains in the form.
 
 ## Legacy DHS / MSV Integration
 
