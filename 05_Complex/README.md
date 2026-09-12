@@ -55,11 +55,11 @@ A significant portion of the business behavior is implemented directly inside Or
 
 The Form contains the following blocks:
 
-* `T_INV` — primary invoice-header database block
-* `D_INV` — invoice service/detail database block
-* `T_INV_TRANS_M` — related store/inventory transaction block based on `TRANS_M`
-* `TOOL` — non-database utility and control block
-* `TITLE` — non-database presentation block
+* `T_INV` - primary invoice-header database block
+* `D_INV` - invoice service/detail database block
+* `T_INV_TRANS_M` - related store/inventory transaction block based on `TRANS_M`
+* `TOOL` - non-database utility and control block
+* `TITLE` - non-database presentation block
 
 The combination of **202 items, 95 triggers, and 30 program units** reflects the large amount of workflow and business logic embedded directly in the legacy Form.
 
