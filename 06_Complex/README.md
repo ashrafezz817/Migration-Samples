@@ -360,7 +360,7 @@ Some of these units represent business rules while others provide shared Forms U
 
 ### Database Packages
 
-Two active explicit Oracle database package dependencies were identified.
+Two active explicit Oracle database package dependencies.
 
 #### `UTL_FILE`
 
