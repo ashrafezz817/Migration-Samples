@@ -324,7 +324,7 @@ A separate payment workflow can also be opened for an existing invoice.
 
 The Form contains one identified active Oracle database package dependency:
 
-* `UTL_URL` — used to escape generated report URLs before opening or transmitting them
+* `UTL_URL` - used to escape generated report URLs before opening or transmitting them
 
 Forms built-ins such as `WEB.SHOW_DOCUMENT` and WebUtil functionality are not counted as Oracle database package dependencies.
 
