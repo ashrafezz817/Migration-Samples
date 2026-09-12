@@ -105,7 +105,7 @@ page 24 (
                                p_triggering_element => 'this'
                              )
                            ) ||
-                           '" class="app-report-edit-link" title="Edit ' ||
+                           '" title="Edit ' ||
                            apex_escape.html_attribute(natdesc) ||
                            '" aria-label="Edit ' ||
                            apex_escape.html_attribute(natdesc) ||
