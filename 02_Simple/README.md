@@ -34,6 +34,8 @@ This Form represents a small reference-data maintenance screen with one database
 | DB Packages    |     0 |
 | Report Objects |     0 |
 
+These counts describe the legacy Oracle Forms module only. The migrated APEX reference implementation and its related database objects are documented separately under `APEX_Reference/`.
+
 The Form contains a single database block, `NAT`, based on the `NATIONALITY` table.
 
 ## Main Database Objects
@@ -76,7 +78,7 @@ The legacy `PRE-INSERT` logic generates a new nationality identifier using:
 * No master-detail relationships
 * No report objects
 
-## Dependencies
+## Legacy Dependencies
 
 ### Database Packages
 
@@ -86,22 +88,22 @@ No direct Oracle database package dependencies in the Form.
 
 The Form references shared standalone database functions including:
 
-* `GET_U_PREV20` — used by the security logic to determine allowed operations
-* `GetVersion` — used when initializing the Forms window title
+* `GET_U_PREV20` - used by the security logic to determine allowed operations
+* `GetVersion` - used when initializing the Forms window title
 
 These are not counted in the `DB Packages` value in the technical summary because they are standalone database functions rather than package calls.
 
 ### LOVs
 
-No Forms LOV objects are defined.
+No LOV dependencies.
 
 ### Other Forms
 
-No significant cross-Form dependency was identified.
+No significant cross-Form dependency.
 
 ### Reports
 
-No report objects or report execution dependencies were identified.
+No report dependencies.
 
 ### Shared Forms Libraries
 
@@ -113,21 +115,40 @@ The Form references shared Oracle Forms Object Libraries including:
 
 These libraries provide shared visual, interface, alert, and application behavior used by the legacy Forms application.
 
-## Migration Considerations
+## APEX Reference Implementation
 
-The functionality can be implemented in Oracle APEX as a straightforward reference-data maintenance page.
+This sample has already been successfully migrated to Oracle APEX.
 
-During migration:
+The completed reference implementation is available under `APEX_Reference/` and includes:
 
-* `NATID` generation should not retain the legacy `MAX(NATID) + 1` approach. A database sequence, identity mechanism, or centralized API should be used instead.
-* Authorization should be implemented using the target application's centralized permission model rather than reproducing Forms block-property security logic.
-* Required-field validation should be implemented using database constraints and/or APEX validations as appropriate.
-* Arabic and English presentation should use the application's standard localization and RTL/LTR mechanisms rather than reproducing Forms-specific interface code.
-* Shared Forms visual and window-management logic does not need to be recreated where Oracle APEX provides equivalent behavior.
-* Legacy localization logic associated with the `TRANS` table should be reviewed and retained only if it is still required by the target application.
+* Oracle APEX Page 24 - **Nationalities**
+* Oracle APEX Page 25 - **Manage Nationality**
+* Screenshots of both migrated pages
+* A dedicated README describing the migrated architecture and modernization approach
+
+The migration did not reproduce the Oracle Form one-to-one. The original maintenance screen was separated into a searchable report page and a focused modal create/edit page.
+
+Key changes include:
+
+* Page 24 uses an Interactive Report for nationality reference data.
+* Page 25 uses a native APEX Form and Automatic Row Processing for create and update operations.
+* The legacy `MAX(NATID) + 1` identifier generation was replaced with `NATIONALITY_SEQ.NEXTVAL`.
+* Management actions use the centralized `NAT_MANAGE` permission through `FND_APP_SECURITY`.
+* System nationalities remain visible but are protected from normal edit and status-change actions.
+* Status changes are performed through a server-side AJAX process with permission, system-record, and current-status checks.
+* Form validations were implemented using native APEX validations, including duplicate English name, Arabic name, and nationality-code checks.
+* Forms-specific window, visual, and interface-direction behavior was replaced with standard APEX application behavior.
+* Shared application styling is used for report status controls instead of page-specific CSS.
+
+No dedicated database package was introduced for this migration. The workflow uses native APEX capabilities and existing application infrastructure because the business function is straightforward reference-data maintenance.
+
+The APEX implementation is provided as a reference for the expected migration approach and quality level. It is not intended to prescribe an exact one-to-one design for other Forms.
+
+See [`APEX_Reference/README.md`](APEX_Reference/README.md) for details of the migrated implementation.
 
 ## Files
 
-* `Nat.fmb` — Original Oracle Forms module
-* `Nat.xml` — XML export for source inspection and analysis
-* `screenshot.png` — Screenshot of the current Oracle Forms user interface
+* `Nat.fmb` - Original Oracle Forms module
+* `Nat.xml` - XML export of the Oracle Forms module
+* `screenshot.png` - Screenshot of the current Oracle Forms user interface
+* `APEX_Reference/` - Completed Oracle APEX reference implementation, page exports, screenshots, and migration notes
