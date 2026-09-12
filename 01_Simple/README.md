@@ -77,7 +77,7 @@ The legacy implementation generates the shift reference using a `MAX(...) + 1` p
 
 ### Database Packages
 
-No direct Oracle database package dependencies were identified in the legacy Form.
+No direct Oracle database package dependencies in the legacy Form.
 
 ### LOVs
 
@@ -85,11 +85,11 @@ No direct Oracle database package dependencies were identified in the legacy For
 
 ### Other Forms
 
-No significant cross-Form dependency was identified.
+No significant cross-Form dependency.
 
 ### Reports
 
-No report objects or report execution dependencies were identified.
+No report objects or report execution dependencies.
 
 ### Shared Forms Libraries
 
