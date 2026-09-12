@@ -11,69 +11,7 @@ page 24 (
         warnOnUnsavedChanges: false
     }
     css {
-        inline:
-            ```css
-            /* ================= Status Toggle: Nationalities IR ================ */
-            
-            #nationalities_ir .nat-status-toggle {
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-              min-width: 2rem;
-              min-height: 2rem;
-              border: 0;
-              border-radius: 0.5rem;
-              background: transparent;
-              text-decoration: none;
-              cursor: pointer;
-            }
-            
-            #nationalities_ir .nat-status-toggle .fa {
-              font-size: 1.25rem;
-            }
-            
-            #nationalities_ir .status-toggle--on {
-              color: #16a34a;
-            }
-            
-            #nationalities_ir .status-toggle--off {
-              color: #94a3b8;
-            }
-            
-            #nationalities_ir .status-toggle--invalid {
-              color: #dc2626;
-            }
-            
-            #nationalities_ir .nat-status-toggle:hover {
-              background: rgba(148, 163, 184, 0.15);
-            }
-            
-            #nationalities_ir .nat-status-toggle:focus {
-              outline: 2px solid var(--ut-focus-outline-color, #2563eb);
-              outline-offset: 2px;
-            }
-            
-            
-            /* ================= edit link: Nationalities IR ================ */
-            #nationalities_ir .nat-edit-link {
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-              min-width: 2rem;
-              min-height: 2rem;
-              border-radius: 0.5rem;
-              text-decoration: none;
-            }
-            
-            #nationalities_ir .nat-edit-link:hover {
-              background: rgba(148, 163, 184, 0.15);
-            }
-            
-            #nationalities_ir .nat-edit-link:focus {
-              outline: 2px solid var(--ut-focus-outline-color, #2563eb);
-              outline-offset: 2px;
-            }
-            ```
+        fileUrls: #APP_FILES#app-report-controls.css
     }
     security {
         authorizationScheme: @has-permission
@@ -167,7 +105,7 @@ page 24 (
                                p_triggering_element => 'this'
                              )
                            ) ||
-                           '" class="nat-edit-link" title="Edit ' ||
+                           '" class="app-report-edit-link" title="Edit ' ||
                            apex_escape.html_attribute(natdesc) ||
                            '" aria-label="Edit ' ||
                            apex_escape.html_attribute(natdesc) ||
@@ -199,26 +137,112 @@ page 24 (
                        end as lang_display,
                 
                        status,
-                       case status
-                         when 'ACTIVE' then 'Active'
-                         when 'INACTIVE' then 'Inactive'
-                         else 'Invalid'
-                       end as active_label,
                 
-                       case status
-                         when 'ACTIVE' then 'fa-toggle-on status-toggle--on'
-                         when 'INACTIVE' then 'fa-toggle-off status-toggle--off'
-                         else 'fa-exclamation-triangle status-toggle--invalid'
-                       end as active_icon_class,
+                       case
+                         when nvl(is_system, 'N') = 'N'
+                          and fnd_app_security.has_permission('NAT_MANAGE') = 'TRUE'
+                         then
+                           '<button type="button"
+                                    class="app-status-toggle js-toggle-nationality-status"
+                                    data-natid="' ||
+                                      apex_escape.html_attribute(to_char(natid)) ||
+                                    '"
+                                    data-current="' ||
+                                      apex_escape.html_attribute(status) ||
+                                    '"
+                                    aria-label="Change status for ' ||
+                                      apex_escape.html_attribute(natdesc) ||
+                                      '. Current status: ' ||
+                                      case status
+                                        when 'ACTIVE' then 'Active'
+                                        when 'INACTIVE' then 'Inactive'
+                                        else 'Invalid'
+                                      end ||
+                                    '"
+                                    title="Change status">' ||
+                
+                               '<span class="fa ' ||
+                                 case status
+                                   when 'ACTIVE' then
+                                     'fa-toggle-on status-toggle--on'
+                                   when 'INACTIVE' then
+                                     'fa-toggle-off status-toggle--off'
+                                   else
+                                     'fa-exclamation-triangle status-toggle--invalid'
+                                 end ||
+                               '" aria-hidden="true"></span>' ||
+                
+                               '<span class="u-VisuallyHidden">' ||
+                                 case status
+                                   when 'ACTIVE' then 'Active'
+                                   when 'INACTIVE' then 'Inactive'
+                                   else 'Invalid'
+                                 end ||
+                               '</span>' ||
+                
+                           '</button>'
+                
+                         else
+                           '<button type="button"
+                                    class="app-status-toggle"
+                                    disabled
+                                    aria-disabled="true"
+                                    aria-label="' ||
+                                      case
+                                        when nvl(is_system, 'N') = 'Y'
+                                        then
+                                          apex_escape.html_attribute(natdesc) ||
+                                          '. System nationality. Status: '
+                                        else
+                                          apex_escape.html_attribute(natdesc) ||
+                                          '. Status: '
+                                      end ||
+                                      case status
+                                        when 'ACTIVE' then 'Active'
+                                        when 'INACTIVE' then 'Inactive'
+                                        else 'Invalid'
+                                      end ||
+                                    '"
+                                    title="' ||
+                                      case
+                                        when nvl(is_system, 'N') = 'Y'
+                                        then 'System nationality'
+                                        else 'Status'
+                                      end ||
+                                    '">' ||
+                
+                               '<span class="fa ' ||
+                                 case status
+                                   when 'ACTIVE' then
+                                     'fa-toggle-on status-toggle--on'
+                                   when 'INACTIVE' then
+                                     'fa-toggle-off status-toggle--off'
+                                   else
+                                     'fa-exclamation-triangle status-toggle--invalid'
+                                 end ||
+                               '" aria-hidden="true"></span>' ||
+                
+                               '<span class="u-VisuallyHidden">' ||
+                                 case status
+                                   when 'ACTIVE' then 'Active'
+                                   when 'INACTIVE' then 'Inactive'
+                                   else 'Invalid'
+                                 end ||
+                               '</span>' ||
+                
+                           '</button>'
+                       end as status_control,
                 
                        created_by,
                        creation_date,
                        last_updated_by,
                        last_update_date
+                
                   from nationality
+                
                  order by sort_order asc,
                           upper(natdesc),
-                          natid;
+                          natid
                 ```
         }
         layout {
@@ -258,65 +282,6 @@ page 24 (
         advanced {
             savedReportMappingIdentifier: 120408648623534280
         }
-
-        column ACTIVE_ICON_CLASS (
-            type: hidden
-            heading {
-                heading: Active Icon Class
-            }
-            layout {
-                sequence: 170
-            }
-            source {
-                dataType: STRING
-            }
-            advanced {
-                endUserAlias: AE
-            }
-        )
-
-        column ACTIVE_LABEL (
-            type: plainText
-            heading {
-                heading: Status
-                alignment: center
-            }
-            layout {
-                sequence: 160
-                columnAlignment: center
-            }
-            columnFormatting {
-                htmlExpression:
-                    ```html
-                    <button type="button"
-                            class="nat-status-toggle js-toggle-nationality-status"
-                            data-natid="#NATID#"
-                            data-current="#STATUS!ATTR#"
-                            aria-label="Change status for #NATDESC!ATTR#. Current status: #ACTIVE_LABEL!ATTR#"
-                            title="Change status">
-                      <span class="fa #ACTIVE_ICON_CLASS!ATTR#" aria-hidden="true"></span>
-                      <span class="u-VisuallyHidden">#ACTIVE_LABEL!HTML#</span>
-                    </button>
-                    ```
-            }
-            source {
-                dataType: STRING
-            }
-            advanced {
-                endUserAlias: AD
-            }
-            enableUsersTo {
-                sort: false
-                filter: false
-                highlight: false
-                controlBreak: false
-                aggregate: false
-                compute: false
-                chart: false
-                groupBy: false
-                pivot: false
-            }
-        )
 
         column CREATED_BY (
             type: plainText
@@ -386,7 +351,7 @@ page 24 (
         )
 
         column IS_SYSTEM (
-            type: plainText
+            type: hidden
             heading {
                 heading: Is System
             }
@@ -628,6 +593,36 @@ page 24 (
             }
         )
 
+        column STATUS_CONTROL (
+            type: plainText
+            heading {
+                heading: Status
+                alignment: center
+            }
+            layout {
+                sequence: 200
+                columnAlignment: center
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: AH
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+            security {
+                escapeSpecialChars: false
+            }
+        )
+
         savedReport 77328 (
             visibility: primaryDefault
             view {
@@ -808,8 +803,10 @@ page 24 (
             plsqlCode:
                 ```plsql
                 declare
-                    l_natid      nationality.natid%type;
-                    l_new_status nationality.status%type;
+                    l_natid          nationality.natid%type;
+                    l_current_status nationality.status%type;
+                    l_new_status     nationality.status%type;
+                    l_is_system      nationality.is_system%type;
                 begin
                     if fnd_app_security.has_permission('NAT_MANAGE') <> 'TRUE' then
                         apex_json.open_object;
@@ -821,23 +818,71 @@ page 24 (
                 
                     l_natid := to_number(apex_application.g_x01);
                 
+                    if apex_application.g_x02 is null
+                       or apex_application.g_x02 not in ('ACTIVE', 'INACTIVE')
+                    then
+                        apex_json.open_object;
+                        apex_json.write('success', false);
+                        apex_json.write('message', 'Invalid nationality status.');
+                        apex_json.close_object;
+                        return;
+                    end if;
+                
+                    select status,
+                           is_system
+                      into l_current_status,
+                           l_is_system
+                      from nationality
+                     where natid = l_natid;
+                
+                    if nvl(l_is_system, 'N') = 'Y' then
+                        apex_json.open_object;
+                        apex_json.write('success', false);
+                        apex_json.write('message', 'System nationalities cannot be changed.');
+                        apex_json.close_object;
+                        return;
+                    end if;
+                
+                    if l_current_status not in ('ACTIVE', 'INACTIVE') then
+                        apex_json.open_object;
+                        apex_json.write('success', false);
+                        apex_json.write('message', 'Nationality has an invalid status.');
+                        apex_json.close_object;
+                        return;
+                    end if;
+                
+                    if l_current_status <> apex_application.g_x02 then
+                        apex_json.open_object;
+                        apex_json.write('success', false);
+                        apex_json.write(
+                            'message',
+                            'The nationality status has changed. Refresh the page and try again.'
+                        );
+                        apex_json.close_object;
+                        return;
+                    end if;
+                
                     update nationality
                        set status =
-                           case status
-                             when 'ACTIVE' then 'INACTIVE'
-                             when 'INACTIVE' then 'ACTIVE'
+                           case l_current_status
+                               when 'ACTIVE'   then 'INACTIVE'
+                               when 'INACTIVE' then 'ACTIVE'
                            end,
                            last_updated_by  = nvl(v('APP_USER'), user),
                            last_update_date = sysdate
                      where natid = l_natid
-                       and status = apex_application.g_x02
-                       and status in ('ACTIVE', 'INACTIVE');
-                
+                       and nvl(is_system, 'N') = 'N'
+                       and status = l_current_status;
                 
                     if sql%rowcount = 0 then
+                        rollback;
+                
                         apex_json.open_object;
                         apex_json.write('success', false);
-                        apex_json.write('message', 'Nationality was not found or has an invalid status.');
+                        apex_json.write(
+                            'message',
+                            'The nationality could not be updated. Refresh the page and try again.'
+                        );
                         apex_json.close_object;
                         return;
                     end if;
@@ -855,6 +900,14 @@ page 24 (
                     apex_json.close_object;
                 
                 exception
+                    when no_data_found then
+                        rollback;
+                
+                        apex_json.open_object;
+                        apex_json.write('success', false);
+                        apex_json.write('message', 'Nationality was not found.');
+                        apex_json.close_object;
+                
                     when value_error then
                         rollback;
                 
@@ -874,7 +927,10 @@ page 24 (
                 
                         apex_json.open_object;
                         apex_json.write('success', false);
-                        apex_json.write('message', 'Nationality status was not updated.');
+                        apex_json.write(
+                            'message',
+                            'Unable to change nationality status.'
+                        );
                         apex_json.close_object;
                 end;
                 ```
