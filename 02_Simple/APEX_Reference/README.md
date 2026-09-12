@@ -131,10 +131,6 @@ Their status controls are also non-interactive, while the server-side status pro
 
 Nationality status is represented using `ACTIVE` and `INACTIVE` values.
 
-Page 24 provides a lightweight status-toggle action for manageable records. The AJAX process validates the current stored status before updating the row, helping prevent stale page state from silently overwriting a newer change.
-
-The control uses shared application styling rather than page-specific CSS so the same report-control behavior can be reused elsewhere in the application.
-
 ### Validation Improvements
 
 The migrated form uses explicit APEX validations for reference-data integrity, including duplicate-name and duplicate-code checks.
