@@ -19,7 +19,7 @@ The legacy cashier-shift Form was migrated to:
 
 The APEX page handles the user interaction and presentation of the start-shift workflow.
 
-The backend package contains the reusable business logic and transactional operations associated with cashier shifts.
+The backend reference extract contains the API operation and supporting private logic used by this migration sample.
 
 ## APEX Page
 
@@ -52,22 +52,11 @@ If an open shift already exists, the page displays the active-shift state rather
 
 Cashier-shift business logic was moved into a reusable database package rather than being implemented entirely inside the APEX page.
 
-Page 49 specifically invokes:
+Page 49 invokes:
 
 `BIL_CASHIER_SHIFT.START_SHIFT`
 
-The package also provides operations for:
-
-* Starting a cashier shift
-* Ending a cashier shift
-* Retrieving the current shift
-* Retrieving an open-shift summary
-* Determining whether a user has an open shift
-* Validating whether an invoice can be created under the active-shift rules
-
-The complete package is included because it demonstrates the backend architecture adopted during the migration.
-
-Not every operation in the package belongs exclusively to Page 49. The package is a shared cashier-shift domain API used by related billing workflows.
+The included SQL file is a migration reference extract containing `START_SHIFT` and the supporting private logic required by that operation. Other cashier-shift API operations used elsewhere in the application are intentionally outside the scope of this sample.
 
 ## Key Modernization Changes
 
@@ -81,7 +70,7 @@ The migrated implementation separates responsibilities:
 * `BIL_CASHIER_SHIFT` handles reusable cashier-shift business operations
 * Database constraints and transactional logic protect critical rules
 
-This reduces dependence on page execution order and allows the same business rules to be reused by other workflows.
+This reduces dependence on page execution order and allows business rules to be reused by related workflows.
 
 ### Shift Reference Generation
 
@@ -111,32 +100,16 @@ The migrated implementation uses the application/session context for values such
 
 * Current user
 * Current information center
-* Application permissions
 
 The backend API can also accept explicit values where appropriate, allowing it to be reused outside the Page 49 UI.
 
-### Centralized Shift Rules
-
-The backend package provides a common location for cashier-shift rules used by related billing workflows.
-
-For example, invoice creation can use the same API to determine whether:
-
-* Shift control is enabled
-* The user has an active shift
-* The user is allowed to bypass the requirement
-
-This avoids duplicating cashier-shift rules across individual APEX pages.
-
 ## Shared Dependencies
 
-The reference implementation relies on application infrastructure outside this sample, including shared application settings, security/permission services, and related billing tables.
+The reference implementation relies on application infrastructure outside this sample, including:
 
-Examples include:
-
-* `FND_APP_SETTINGS_PKG`
-* `FND_APP_SECURITY`
 * `CASHIER_SHIFT`
-* Invoice/payment data used when closing or validating shifts
+* Application session context for the current user and information center
+* Database constraints supporting the one-open-shift rule
 
 These components are part of the wider application architecture and are not necessarily included in this sample.
 
@@ -153,7 +126,7 @@ A future migration does not need to use the same number of APEX pages, regions, 
 The appropriate design should depend on the functionality of the individual Form while following the same general objectives:
 
 * Preserve required business behavior
-* Centralize reusable business rules
+* Centralize reusable business rules where appropriate
 * Enforce critical transactional rules in the backend
 * Use native APEX capabilities where appropriate
 * Remove obsolete Forms-specific behavior
@@ -162,6 +135,6 @@ The appropriate design should depend on the functionality of the individual Form
 ## Files
 
 * `hmisfox_page_49.apx` - Oracle APEX Page 49 export
-* `backend/BIL_CASHIER_SHIFT.sql` - complete cashier-shift backend package specification and body
+* `backend/BIL_CASHIER_SHIFT.sql` - cashier-shift migration reference extract
 * `screenshots/screenshot-no-open-shift.png` - APEX page when the cashier has no active shift
 * `screenshots/screenshot-open-shift.png` - APEX page when an active cashier shift already exists
