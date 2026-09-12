@@ -1,0 +1,852 @@
+page 52 (
+    name: Clinics
+    alias: CLINICS
+    title: Clinics
+    pageGroup: @clinical
+    appearance {
+        pageTemplate: @/standard
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        warnOnUnsavedChanges: false
+    }
+    css {
+        fileUrls: #APP_FILES#empty-state.css
+        inline:
+            ```css
+            /* ================= Status Icon: Clinics IR ================ */
+            
+            #clinics-report .clinic-status-toggle {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              min-width: 2rem;
+              min-height: 2rem;
+              border: 0;
+              border-radius: 0.5rem;
+              background: transparent;
+              text-decoration: none;
+            }
+            
+            #clinics-report .clinic-status-toggle .fa {
+              font-size: 1.25rem;
+            }
+            
+            #clinics-report .status-toggle--on {
+              color: #16a34a;
+            }
+            
+            #clinics-report .status-toggle--off {
+              color: #94a3b8;
+            }
+            
+            #clinics-report .status-toggle--invalid {
+              color: #dc2626;
+            }
+            ```
+    }
+    security {
+        authorizationScheme: @has-permission
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+    }
+    advanced {
+        enableDuplicatePageSubmissions: false
+    }
+
+    region breadcrumb (
+        name: Breadcrumb
+        type: breadcrumb
+        source {
+            breadcrumb: @breadcrumb
+        }
+        layout {
+            sequence: 20
+            slot: regionBody
+        }
+        appearance {
+            template: @/title-bar
+            templateOptions: [
+                #DEFAULT#
+                t-BreadcrumbRegion--useBreadcrumbTitle
+            ]
+        }
+        componentAppearance {
+            breadcrumbTemplate: @/breadcrumb
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    region clinics (
+        name: Clinics
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: regionBody
+        }
+        appearance {
+            template: @/title-bar
+            templateOptions: [
+                #DEFAULT#
+                t-BreadcrumbRegion--useRegionTitle
+            ]
+        }
+        accessibility {
+            useLandmark: false
+        }
+    )
+
+    region clinics-report (
+        name: Clinics Report
+        type: interactiveReport
+        source {
+            location: localDatabase
+            type: sqlQuery
+            sqlQuery:
+                ```sql
+                select CLINICID,
+                       CLINICNAME,
+                       OLD_PAT_TIME,
+                       NEW_PAT_TIME,
+                       REVIEW_DATES,
+                       LOCATION,
+                       WATING_ROOM,
+                       WATING_ROOM2,
+                       CLINICNAME_AR,
+                       AGE_MIN,
+                       AGE_MAX,
+                       CASE
+                       WHEN SIX = 1 THEN 'Male'
+                       WHEN SIX = 2 THEN 'Female'
+                       WHEN SIX IS NULL THEN 'No Restriction'
+                       ELSE 'Unknown'
+                       END AS SIX,
+                       SYS_CAT_TYPE,
+                       CASE VS_IS_MUST
+                       WHEN 'Y' THEN
+                            '<span class="clinic-status-toggle" title="Vital signs required" aria-label="Required">
+                              <span class="fa fa-toggle-on status-toggle--on" aria-hidden="true"></span>
+                            </span>'
+                       WHEN 'N' THEN
+                            '<span class="clinic-status-toggle" title="Vital signs not required" aria-label="Not Required">
+                              <span class="fa fa-toggle-off status-toggle--off" aria-hidden="true"></span>
+                            </span>'
+                       ELSE     
+                           '<span class="clinic-status-toggle" title="Invalid vital signs setting" aria-label="Invalid status">
+                              <span class="fa fa-exclamation-triangle status-toggle--invalid" aria-hidden="true"></span>
+                            </span>'
+                       END AS VS_IS_MUST,     
+                       CCHI_CODE,
+                       OBJECT_VERSION_NUMBER,
+                       CREATED_BY,
+                       CREATION_DATE,
+                       LAST_UPDATED_BY,
+                       LAST_UPDATE_DATE,
+                       LAST_UPDATE_LOGIN
+                  from CLINICS
+                  order by upper(clinicname)
+                ```
+        }
+        layout {
+            sequence: 30
+            slot: regionBody
+        }
+        appearance {
+            template: @/standard
+            templateOptions: [
+                #DEFAULT#
+                t-Region--noPadding
+                js-showMaximizeButton
+                t-Region--hideHeader js-addHiddenHeadingRoleDesc
+                t-Region--scrollBody
+            ]
+            cssClasses: use-empty-state
+        }
+        advanced {
+            htmlDomId: clinics-report
+        }
+        link {
+            linkColumn: customTarget
+            target: {
+                page: 53
+                items: {
+                    P53_CLINICID: #CLINICID#
+                }
+                clearCache: 53
+            }
+            conditionType: expression
+            plsqlExpression: fnd_app_security.has_permission('CLINICS_UPDATE') = 'TRUE'
+        }
+        pagination {
+            type: rowRangesXToY
+        }
+        messages {
+            whenNoDataFound:
+                ```
+                <div class="empty-state empty-state--region empty-state--image-dune">
+                  <h3 class="empty-state__title">No clinics found</h3>
+                  <p class="empty-state__text">
+                    No clinics exist.
+                  </p>
+                </div>
+                ```
+        }
+        actionsMenu {
+            controlBreak: false
+            highlight: false
+            compute: false
+            aggregate: false
+            chart: false
+            groupBy: false
+            pivot: false
+        }
+        advanced {
+            savedReportMappingIdentifier: 16839907911928634
+        }
+
+        column AGE_MAX (
+            type: plainText
+            heading {
+                heading: Maximum Age
+                alignment: center
+            }
+            layout {
+                sequence: 120
+                columnAlignment: center
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: K
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column AGE_MIN (
+            type: plainText
+            heading {
+                heading: Minimum Age
+                alignment: center
+            }
+            layout {
+                sequence: 110
+                columnAlignment: center
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: J
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column CCHI_CODE (
+            type: plainTextBasedOnLov
+            heading {
+                heading: CCHI Code
+                alignment: center
+            }
+            lov {
+                lov: @clinics-cchi
+            }
+            layout {
+                sequence: 50
+                columnAlignment: center
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: O
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column CLINICID (
+            type: hidden
+            heading {
+                heading: Clinicid
+            }
+            layout {
+                sequence: 10
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: A
+            }
+        )
+
+        column CLINICNAME (
+            type: plainText
+            heading {
+                heading: English Name
+            }
+            layout {
+                sequence: 20
+            }
+            accessibility {
+                valueIdentifiesRow: true
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: B
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column CLINICNAME_AR (
+            type: plainText
+            heading {
+                heading: Arabic Name
+                alignment: end
+            }
+            layout {
+                sequence: 30
+                columnAlignment: end
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: I
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column CREATED_BY (
+            type: plainText
+            heading {
+                heading: Created By
+            }
+            layout {
+                sequence: 180
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: Q
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column CREATION_DATE (
+            type: plainText
+            heading {
+                heading: Creation Date
+            }
+            layout {
+                sequence: 190
+            }
+            source {
+                dataType: DATE
+            }
+            advanced {
+                endUserAlias: R
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column LAST_UPDATED_BY (
+            type: plainText
+            heading {
+                heading: Last Updated By
+            }
+            layout {
+                sequence: 200
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: S
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column LAST_UPDATE_DATE (
+            type: plainText
+            heading {
+                heading: Last Update Date
+            }
+            layout {
+                sequence: 210
+            }
+            source {
+                dataType: DATE
+            }
+            advanced {
+                endUserAlias: T
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column LAST_UPDATE_LOGIN (
+            type: plainText
+            heading {
+                heading: Last Update Login
+            }
+            layout {
+                sequence: 220
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: U
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column LOCATION (
+            type: plainText
+            heading {
+                heading: Location
+            }
+            layout {
+                sequence: 140
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: F
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column NEW_PAT_TIME (
+            type: plainText
+            heading {
+                heading: New Patient Duration (min)
+                alignment: center
+            }
+            layout {
+                sequence: 70
+                columnAlignment: center
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: D
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column OBJECT_VERSION_NUMBER (
+            type: plainText
+            heading {
+                heading: Object Version Number
+                alignment: end
+            }
+            layout {
+                sequence: 170
+                columnAlignment: end
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: P
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column OLD_PAT_TIME (
+            type: plainText
+            heading {
+                heading: Review Visit Duration (min)
+                alignment: center
+            }
+            layout {
+                sequence: 80
+                columnAlignment: center
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: C
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column REVIEW_DATES (
+            type: plainText
+            heading {
+                heading: Review Days
+                alignment: center
+            }
+            layout {
+                sequence: 100
+                columnAlignment: center
+            }
+            source {
+                dataType: NUMBER
+            }
+            advanced {
+                endUserAlias: E
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column SIX (
+            type: plainText
+            heading {
+                heading: Gender Restriction
+                alignment: center
+            }
+            layout {
+                sequence: 130
+                columnAlignment: center
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: V
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column SYS_CAT_TYPE (
+            type: plainTextBasedOnLov
+            heading {
+                heading: Clinic Category
+                alignment: center
+            }
+            lov {
+                lov: @clinic-categories
+            }
+            layout {
+                sequence: 40
+                columnAlignment: center
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: M
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column VS_IS_MUST (
+            type: plainText
+            heading {
+                heading: Vital Signs Required
+                alignment: center
+            }
+            layout {
+                sequence: 60
+                columnAlignment: center
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: N
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+            security {
+                escapeSpecialChars: false
+            }
+        )
+
+        column WATING_ROOM (
+            type: plainText
+            heading {
+                heading: Waiting Room
+            }
+            layout {
+                sequence: 150
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: G
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        column WATING_ROOM2 (
+            type: plainText
+            heading {
+                heading: Secondary Waiting Room
+            }
+            layout {
+                sequence: 160
+            }
+            source {
+                dataType: STRING
+            }
+            advanced {
+                endUserAlias: H
+            }
+            enableUsersTo {
+                highlight: false
+                controlBreak: false
+                aggregate: false
+                compute: false
+                chart: false
+                groupBy: false
+                pivot: false
+            }
+        )
+
+        page {
+            borderWidth: 0.5
+            borderColor: #666666
+        }
+
+        savedReport primary (
+            visibility: primaryDefault
+            view {
+                rowsPerPage: 50
+            }
+        )
+
+    )
+
+    button create (
+        buttonName: CREATE
+        label: Create
+        layout {
+            sequence: 10
+            region: @breadcrumb
+            slot: CREATE
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+            icon: fa-plus
+        }
+        behavior {
+            action: redirectThisApp
+            target: {
+                page: 53
+                clearCache: 53
+            }
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression: fnd_app_security.has_permission('CLINICS_CREATE') = 'TRUE'
+        }
+    )
+
+    dynamicAction refresh-after-create (
+        name: Refresh after create
+        execution {
+            sequence: 10
+        }
+        when {
+            event: apexafterclosedialog
+            selectionType: button
+            button: @create
+        }
+
+        action native-refresh (
+            action: refresh
+            affectedElements {
+                selectionType: region
+                region: @clinics-report
+            }
+            execution {
+                sequence: 10
+                fireOnInit: false
+            }
+        )
+
+    )
+
+    dynamicAction refresh-after-update (
+        name: refresh after update
+        execution {
+            sequence: 20
+        }
+        when {
+            event: apexafterclosedialog
+            selectionType: region
+            region: @clinics-report
+        }
+
+        action native-refresh (
+            action: refresh
+            settings {
+                maintainPagination: true
+            }
+            affectedElements {
+                selectionType: region
+                region: @clinics-report
+            }
+            execution {
+                sequence: 10
+                fireOnInit: false
+            }
+        )
+
+    )
+
+)
+

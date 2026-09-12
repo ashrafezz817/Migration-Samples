@@ -1,0 +1,673 @@
+page 53 (
+    name: Manage Clinic
+    alias: MANAGE-CLINIC
+    title: Manage Clinic
+    pageGroup: @clinical
+    appearance {
+        pageMode: modalDialog
+        dialogTemplate: @/modal-dialog
+        templateOptions: #DEFAULT#
+    }
+    navigation {
+        cursorFocus: doNotFocusCursor
+    }
+    security {
+        authorizationScheme: @has-permission
+        pageAccessProtection: argumentsMustHaveChecksum
+        formAutoComplete: false
+    }
+
+    region buttons (
+        name: Buttons
+        type: staticContent
+        layout {
+            sequence: 10
+            slot: REGION_POSITION_03
+        }
+        appearance {
+            template: @/buttons-container
+            templateOptions: [
+                #DEFAULT#
+                t-ButtonRegion--noBorder
+            ]
+        }
+    )
+
+    region new (
+        name: Clinic Form
+        type: form
+        source {
+            location: localDatabase
+            tableName: CLINICS
+        }
+        layout {
+            sequence: 10
+            slot: regionBody
+        }
+        appearance {
+            template: @/blank-with-attributes
+            templateOptions: #DEFAULT#
+        }
+    )
+
+    pageItem P53_AGE_MAX (
+        type: numberField
+        label {
+            label: Maximum Age
+            alignment: left
+        }
+        settings {
+            minValue: 0
+            maxValue: 150
+        }
+        layout {
+            sequence: 110
+            region: @new
+            slot: regionBody
+            alignment: left
+            startNewRow: false
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        source {
+            formRegion: @new
+            column: AGE_MAX
+            dataType: number
+        }
+    )
+
+    pageItem P53_AGE_MIN (
+        type: numberField
+        label {
+            label: Minimum Age
+            alignment: left
+        }
+        settings {
+            minValue: 0
+            maxValue: 150
+        }
+        layout {
+            sequence: 100
+            region: @new
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        source {
+            formRegion: @new
+            column: AGE_MIN
+            dataType: number
+        }
+    )
+
+    pageItem P53_CCHI_CODE (
+        type: popupLov
+        label {
+            label: CCHI Code
+            alignment: left
+        }
+        settings {
+            fetchOnSearch: true
+        }
+        search {
+            matchType: startsWith
+        }
+        lov {
+            type: sharedComponent
+            lov: @clinics-cchi
+            displayExtraValues: false
+        }
+        layout {
+            sequence: 40
+            region: @new
+            slot: regionBody
+            alignment: left
+            startNewRow: false
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        validation {
+            maxLength: 20
+        }
+        source {
+            formRegion: @new
+            column: CCHI_CODE
+            dataType: varchar2
+        }
+    )
+
+    pageItem P53_CLINICID (
+        type: hidden
+        layout {
+            sequence: 10
+            region: @new
+            slot: regionBody
+        }
+        source {
+            formRegion: @new
+            column: CLINICID
+            dataType: number
+            queryOnly: true
+            primaryKey: true
+        }
+        security {
+            sessionStateProtection: checksumRequiredSessionLevel
+        }
+    )
+
+    pageItem P53_CLINICNAME (
+        type: textField
+        label {
+            label: English Name
+            alignment: left
+        }
+        layout {
+            sequence: 10
+            region: @new
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/required-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        validation {
+            valueRequired: true
+            maxLength: 30
+        }
+        advanced {
+            cssClasses: en
+        }
+        source {
+            formRegion: @new
+            column: CLINICNAME
+            dataType: varchar2
+        }
+    )
+
+    pageItem P53_CLINICNAME_AR (
+        type: textField
+        label {
+            label: Arabic Name
+            alignment: left
+        }
+        layout {
+            sequence: 20
+            region: @new
+            slot: regionBody
+            alignment: left
+            startNewRow: false
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        validation {
+            maxLength: 30
+        }
+        advanced {
+            cssClasses: ar
+        }
+        source {
+            formRegion: @new
+            column: CLINICNAME_AR
+            dataType: varchar2
+        }
+    )
+
+    pageItem P53_LOCATION (
+        type: hidden
+        layout {
+            sequence: 130
+            region: @new
+            slot: regionBody
+        }
+        source {
+            formRegion: @new
+            column: LOCATION
+            dataType: varchar2
+        }
+    )
+
+    pageItem P53_NEW_PAT_TIME (
+        type: numberField
+        label {
+            label: New Patient Duration (min)
+            alignment: left
+        }
+        settings {
+            minValue: 0
+        }
+        layout {
+            sequence: 60
+            region: @new
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        source {
+            formRegion: @new
+            column: NEW_PAT_TIME
+            dataType: number
+        }
+    )
+
+    pageItem P53_OLD_PAT_TIME (
+        type: numberField
+        label {
+            label: Review Visit Duration (min)
+            alignment: left
+        }
+        settings {
+            minValue: 0
+        }
+        layout {
+            sequence: 70
+            region: @new
+            slot: regionBody
+            alignment: left
+            startNewRow: false
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        source {
+            formRegion: @new
+            column: OLD_PAT_TIME
+            dataType: number
+        }
+    )
+
+    pageItem P53_REVIEW_DATES (
+        type: numberField
+        label {
+            label: Review Days
+            alignment: left
+        }
+        settings {
+            minValue: 0
+        }
+        layout {
+            sequence: 90
+            region: @new
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            width: 30
+        }
+        source {
+            formRegion: @new
+            column: REVIEW_DATES
+            dataType: number
+        }
+    )
+
+    pageItem P53_SIX (
+        type: selectList
+        label {
+            label: Gender Restriction
+            alignment: left
+        }
+        lov {
+            type: staticValues
+            staticValues: STATIC:Male;1,Female;2
+            displayExtraValues: false
+            nullDisplayValue: No Restriction
+        }
+        layout {
+            sequence: 120
+            region: @new
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            height: 1
+        }
+        source {
+            formRegion: @new
+            column: SIX
+            dataType: number
+        }
+        help {
+            helpText: Any means the clinic accepts all patient genders. Male/Female restricts clinic use to that gender.
+        }
+    )
+
+    pageItem P53_SYS_CAT_TYPE (
+        type: selectList
+        label {
+            label: Clinic Category
+            alignment: left
+        }
+        lov {
+            type: sharedComponent
+            lov: @clinic-categories
+            displayExtraValues: false
+        }
+        layout {
+            sequence: 30
+            region: @new
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            height: 1
+        }
+        source {
+            formRegion: @new
+            column: SYS_CAT_TYPE
+            dataType: varchar2
+        }
+    )
+
+    pageItem P53_VS_IS_MUST (
+        type: switch
+        label {
+            label: Vital Signs Required
+            alignment: left
+        }
+        settings {
+            useDefaults: false
+            onValue: Y
+            offValue: N
+        }
+        layout {
+            sequence: 50
+            region: @new
+            slot: regionBody
+            alignment: left
+        }
+        appearance {
+            template: @/optional-floating
+            templateOptions: #DEFAULT#
+            cssClasses: app-switch-row
+        }
+        source {
+            formRegion: @new
+            column: VS_IS_MUST
+            dataType: varchar2
+        }
+        default {
+            type: static
+            staticValue: Y
+        }
+    )
+
+    pageItem P53_WATING_ROOM (
+        type: hidden
+        layout {
+            sequence: 140
+            region: @new
+            slot: regionBody
+        }
+        source {
+            formRegion: @new
+            column: WATING_ROOM
+            dataType: varchar2
+        }
+    )
+
+    pageItem P53_WATING_ROOM2 (
+        type: hidden
+        layout {
+            sequence: 150
+            region: @new
+            slot: regionBody
+        }
+        source {
+            formRegion: @new
+            column: WATING_ROOM2
+            dataType: varchar2
+        }
+    )
+
+    button cancel (
+        buttonName: CANCEL
+        label: Cancel
+        layout {
+            sequence: 10
+            region: @buttons
+            slot: CLOSE
+        }
+        appearance {
+            buttonTemplate: @/text
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            action: triggerAction
+            executeValidations: false
+        }
+
+        triggerAction native-dialog-cancel (
+            action: cancelDialog
+            execution {
+                sequence: 10
+            }
+        )
+
+    )
+
+    button create (
+        buttonName: CREATE
+        label: Create
+        layout {
+            sequence: 10
+            region: @buttons
+            slot: CREATE
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            showProcessing: true
+            warnOnUnsavedChanges: doNotCheck
+            databaseAction: insert
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P53_CLINICID is null
+                and fnd_app_security.has_permission('CLINICS_CREATE') = 'TRUE'
+                ```
+        }
+    )
+
+    button delete (
+        buttonName: DELETE
+        label: Delete
+        layout {
+            sequence: 20
+            region: @buttons
+            slot: DELETE
+        }
+        appearance {
+            buttonTemplate: @/text
+            templateOptions: [
+                #DEFAULT#
+                t-Button--danger
+            ]
+        }
+        behavior {
+            executeValidations: false
+            warnOnUnsavedChanges: doNotCheck
+            databaseAction: delete
+            requiresConfirmation: true
+        }
+        confirmation {
+            message: Delete this clinic permanently? This cannot be undone and is only allowed when the clinic has no related invoices, visits, appointments, queues, requests, or doctor assignments.
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P53_CLINICID is not null
+                and fnd_app_security.has_permission('CLINICS_DELETE') = 'TRUE'
+                ```
+        }
+    )
+
+    button save (
+        buttonName: SAVE
+        label: Save
+        layout {
+            sequence: 20
+            region: @buttons
+            slot: CREATE
+        }
+        appearance {
+            buttonTemplate: @/text
+            hot: true
+            templateOptions: #DEFAULT#
+        }
+        behavior {
+            showProcessing: true
+            warnOnUnsavedChanges: doNotCheck
+            databaseAction: update
+        }
+        serverSideCondition {
+            type: expression
+            plsqlExpression:
+                ```plsql
+                :P53_CLINICID is not null
+                and fnd_app_security.has_permission('CLINICS_UPDATE') = 'TRUE'
+                ```
+        }
+    )
+
+    validation age-range-is-valid (
+        name: Age range is valid
+        execution {
+            sequence: 30
+        }
+        validation {
+            type: functionBodyReturningBoolean
+            plsqlFunctionBody:
+                ```plsql
+                return (:P53_AGE_MIN is null or :P53_AGE_MIN between 0 and 150)
+                   and (:P53_AGE_MAX is null or :P53_AGE_MAX between 0 and 150)
+                   and (:P53_AGE_MIN is null or :P53_AGE_MAX is null or :P53_AGE_MIN <= :P53_AGE_MAX);
+                ```
+        }
+        error {
+            errorMessage: Age range must be between 0 and 150, and Minimum Age cannot be greater than Maximum Age.
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CREATE,SAVE
+        }
+    )
+
+    validation english-name-is-required (
+        name: English Name is required.
+        execution {
+            sequence: 10
+        }
+        validation {
+            type: itemIsNotNull
+            item: P53_CLINICNAME
+        }
+        error {
+            errorMessage: English Name is required.
+            associatedItem: @P53_CLINICNAME
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CREATE,SAVE
+        }
+    )
+
+    validation timing-values-cannot-be-negative (
+        name: Timing values cannot be negative
+        execution {
+            sequence: 20
+        }
+        validation {
+            type: functionBodyReturningBoolean
+            plsqlFunctionBody:
+                ```plsql
+                return nvl(:P53_NEW_PAT_TIME, 0) >= 0
+                   and nvl(:P53_OLD_PAT_TIME, 0) >= 0
+                   and nvl(:P53_REVIEW_DATES, 0) >= 0;
+                ```
+        }
+        error {
+            errorMessage: Duration and review days cannot be negative.
+        }
+        serverSideCondition {
+            type: requestIsContainedInValue
+            value: CREATE,SAVE
+        }
+    )
+
+    process dialog-close (
+        name: Dialog Close
+        type: closeDialog
+        execution {
+            sequence: 20
+        }
+        advanced {
+            executionMappingIdentifier: 18085429711780007
+        }
+    )
+
+    process initialize-form-manage-clinic (
+        name: Initialize form Manage Clinic
+        type: formInitialization
+        formRegion: @new
+        execution {
+            sequence: 10
+            point: beforeHeader
+        }
+        advanced {
+            executionMappingIdentifier: 16884689050767208
+        }
+    )
+
+    process process-clinic-form (
+        name: "Process Clinic Form "
+        type: formAutoRowProcessing
+        formRegion: @new
+        execution {
+            sequence: 10
+        }
+        successMessage {
+            successMessage: Clinic saved.
+        }
+        error {
+            errorMessage: Unable to save or delete clinic. If deleting, make sure the clinic is not used by invoices.
+        }
+        advanced {
+            executionMappingIdentifier: 16888814799767250
+        }
+    )
+
+)
+
