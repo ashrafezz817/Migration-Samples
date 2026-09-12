@@ -491,7 +491,7 @@ Key considerations include:
 
 ## Files
 
-* `Inv_Small_Cash.fmb` — Original Oracle Forms module
-* `Inv_Small_Cash.xml` — XML export for source inspection and analysis
-* `screenshot.png` — Screenshot of the current Oracle Forms user interface
+* `Inv_Small_Cash.fmb` - Original Oracle Forms module
+* `Inv_Small_Cash.xml` - XML export for source inspection and analysis
+* `screenshot.png` - Screenshot of the current Oracle Forms user interface
 
