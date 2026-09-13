@@ -10,7 +10,7 @@ These samples were selected to represent different functional areas and levels o
 
 The samples are representative examples only and should not be interpreted as the complexity distribution of the complete application.
 
-Each sample includes the legacy Oracle Forms implementation and a completed Oracle APEX reference implementation. The APEX references demonstrate the expected migration approach and quality level, but they are not intended to require future Forms to be reproduced using the exact same page structure or technical design.
+Each numbered sample includes the legacy Oracle Forms implementation and an Oracle APEX reference implementation showing the migration approach already used in the target application. These references demonstrate the expected migration approach and quality level, but they are not intended to require future Forms to be reproduced using the exact same page structure or technical design.
 
 ## Sample Overview
 
@@ -40,7 +40,7 @@ The figures below describe the structural footprint of the legacy Oracle Forms m
 
 ## APEX Reference Implementations
 
-The completed APEX references demonstrate several different migration patterns rather than applying one technical solution to every Form.
+The APEX references demonstrate several different migration patterns rather than applying one technical solution to every Form.
 
 | Legacy Sample | APEX Reference | Backend Approach |
 | --- | --- | --- |
@@ -60,6 +60,10 @@ The references show that migration may include:
 - Retiring or excluding legacy functionality that is no longer part of the target workflow
 - Improving transaction safety, optimistic locking, concurrency handling, and server-side validation
 - Keeping shared application services outside an individual migration sample when their internal implementation is not required to understand the workflow
+
+The APEX exports represent the current migrated state of the corresponding workflows. A visible control or legacy field in an export should not automatically be interpreted as a target migration requirement when the individual sample README explicitly marks that functionality as outside scope.
+
+For example, the Patient reference still contains residual Discount Card controls in Page 19, but Discount Card functionality is **not part of the intended Patient migration scope** and should not be included in the migration estimate for that sample.
 
 ## Complexity Classification
 
@@ -103,14 +107,14 @@ Typically contains several of the following:
 
 ## Contents of Each Sample
 
-Each sample directory contains the legacy source material:
+Each numbered sample directory contains the legacy source material:
 
 - **`.fmb`** - Original Oracle Forms module
 - **`.xml`** - XML export of the Form
 - **`screenshot.png`** - Screenshot of the Oracle Forms user interface
-- **`README.md`** - Description of the legacy Form, its functionality, technical characteristics, dependencies, and completed APEX migration reference
+- **`README.md`** - Description of the legacy Form, its functionality, technical characteristics, dependencies, and APEX migration reference
 
-Each sample also contains an **`APEX_Reference/`** directory with the completed migrated implementation. Depending on the sample, this can include:
+Each numbered sample also contains an **`APEX_Reference/`** directory with the corresponding migrated implementation. Depending on the sample, this can include:
 
 - Oracle APEX page exports
 - APEX screenshots
@@ -120,13 +124,21 @@ Each sample also contains an **`APEX_Reference/`** directory with the completed 
 
 Not every APEX reference contains a custom database package. Native APEX processing is intentionally used where it is sufficient for the workflow.
 
+## Supplemental Examples
+
+The [`Extras/`](./Extras/) directory contains additional Oracle Forms XML exports and screenshots from other areas of the application.
+
+These files are supplemental reference material only. They are **not part of the six representative Simple, Medium, and Complex samples**, are not included in the Technical Profile counts, and do not have corresponding APEX reference implementations in this repository.
+
+They are included to give reviewers additional exposure to the wider Forms application without expanding the defined six-sample estimation scope.
+
 ## Migration Expectations
 
 The objective of the migration is not to reproduce Oracle Forms behavior one-to-one.
 
 The required business behavior should be preserved while the implementation is modernized where appropriate.
 
-The completed reference implementations demonstrate that legacy functionality may be:
+The reference implementations demonstrate that legacy functionality may be:
 
 - Simplified or redesigned
 - Split across multiple APEX pages
@@ -136,6 +148,8 @@ The completed reference implementations demonstrate that legacy functionality ma
 - Excluded when the functionality is obsolete or outside the current migration scope
 
 The exact APEX page structure and package boundaries shown in these samples are reference designs, not mandatory templates for every remaining Form.
+
+The individual sample READMEs define the migration scope when the current APEX export contains residual or not-yet-removed functionality.
 
 ## Backend Reference Scope
 
