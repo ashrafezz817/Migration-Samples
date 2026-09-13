@@ -4,7 +4,7 @@
 
 This repository contains representative samples from an existing Healthcare Information System (HIS) that is being evaluated for migration from **Oracle Forms to Oracle APEX**.
 
-The complete application contains approximately 500 Oracle Forms, with business logic distributed between Oracle Forms and the Oracle Database. Based on the current application inventory, the Forms are classified into approximately X Simple, Y Medium, and Z Complex modules.
+The complete application contains approximately 550 Oracle Forms, with business logic distributed between Oracle Forms and the Oracle Database. Based on the current application inventory, the Forms are classified into approximately 150 Simple, 200 Medium, and 200 Complex modules.
 
 These samples were selected to represent different functional areas and levels of migration complexity.
 
