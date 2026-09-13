@@ -17,7 +17,9 @@ The Form contains only two blocks, but it is highly event-driven with 170 items,
 - Maintains National ID / Iqama, passport, and Border Number
 - Maintains English and Arabic patient names
 - Maintains demographics, address, phones, email, emergency contact, and next of kin
-- Maintains payer, policy, class, member, and insurance information
+- Maintains employer and occupation information
+- Associates patients with companies, insurers, TPAs, and insurance classes
+- Maintains policy, member, card, and insurance information
 - Validates identity and coverage data
 - Supports eligibility and patient-retrieval workflows
 - Provides mobile-verification / OTP functionality
@@ -230,6 +232,14 @@ Page 19 contains patient registration and demographic maintenance using explicit
 
 The page maintains identity, legal names, demographics, contact information, emergency contact, coverage, insurance/direct-contract data, newborn relationships, and audit information.
 
+### Current APEX Reference Scope
+
+Page 19 is not yet a fully finalized migration of every element still present in the page export.
+
+In particular, **Discount Card functionality is not part of the intended target migration**. Discount Card-related controls may still be visible in the current Page 19 export or interface, but they should not be treated as functionality that must be migrated, reproduced, or included in the migration estimate for this Patient sample.
+
+The legacy Form documentation still records Discount Card objects because they are part of the source Form. That does not make them part of the target APEX scope.
+
 ### Patient Backend
 
 Page 19 saves through:
@@ -281,16 +291,17 @@ The APEX implementation keeps those concerns as separate application modules ins
 - Reusable name transliteration support
 - Centralized application permissions
 - Related workflows separated into their own modules
+- Discount Card functionality excluded from the target Patient migration
 - Forms-specific windows, canvases, Object Libraries, globals, and item-property manipulation not reproduced unnecessarily
 - Legacy DHS/MSV file integration excluded from this reference
 
 The required business behavior is preserved while avoiding unnecessary reproduction of Forms-specific implementation patterns.
 
-See [`APEX_Reference/README.md`](APEX_Reference/README.md) for the detailed migrated implementation.
+See [`APEX_Reference/README.md`](APEX_Reference/README.md) for the detailed migrated implementation and scope notes.
 
 ## Files
 
 - `Patient.fmb` - Original Oracle Forms module
 - `Patient.xml` - XML export of the Oracle Forms module
 - `screenshot.png` - Screenshot of the current Oracle Forms user interface
-- `APEX_Reference/` - Completed Oracle APEX reference implementation, backend package, screenshots, and migration notes
+- `APEX_Reference/` - Oracle APEX reference implementation, backend package, screenshots, and migration notes
