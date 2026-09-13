@@ -6,7 +6,7 @@ This directory contains the migrated Oracle APEX implementation corresponding to
 
 The implementation is provided as a **reference for the expected migration approach and quality level**. It is not intended to require future Forms to be reproduced using the exact same page structure or technical design.
 
-During migration, legacy Forms functionality may be simplified, redesigned, split across multiple APEX pages, moved into reusable database APIs, or replaced with native APEX functionality where appropriate.
+During migration, legacy Forms functionality may be simplified, redesigned, split across multiple APEX pages, moved into reusable database APIs, replaced with native APEX functionality, or excluded from the target scope where appropriate.
 
 For this sample, the large legacy Patient Form was separated into a patient search and action page plus a focused patient-demographics page. Patient creation and update rules were moved into a reusable server-side package.
 
@@ -115,6 +115,16 @@ The maintained information includes areas such as:
 - Subscriber and membership information
 - Newborn and parent-patient information
 - Audit information
+
+## Functionality Not Included in the Target Migration
+
+The current Page 19 export is still an in-progress application page and contains some residual functionality that is **not part of the intended Patient migration scope**.
+
+### Discount Cards
+
+Discount Card-related items may still appear in the Page 19 export and current APEX interface. Their presence should **not** be interpreted as a requirement to migrate or reproduce the legacy Discount Card functionality.
+
+Discount Cards are intentionally excluded from the target Patient migration and should not be included when assessing the required Patient functionality or estimating the migration effort for this sample.
 
 ## Patient Creation and Update
 
@@ -318,6 +328,7 @@ Key changes include:
 - English/Arabic transliteration is implemented as a reusable service instead of Forms-specific field logic.
 - Permissions use centralized application authorization.
 - Related billing, eligibility and clinical workflows are separate application modules rather than responsibilities of one patient-maintenance screen.
+- Discount Card functionality is intentionally excluded from the target Patient migration even if residual controls are visible in the current Page 19 export.
 - Forms-specific window, canvas, object-library and item-manipulation patterns are not reproduced unnecessarily.
 
 The objective is to preserve required patient-management behavior while creating clearer domain and workflow boundaries.
@@ -361,6 +372,8 @@ The required business behavior should be preserved while allowing responsibiliti
 - Eligibility and insurance workflows
 - Billing workflows
 - Other clinical and administrative modules
+
+Residual functionality still visible in the current APEX export should not automatically be interpreted as target-scope functionality. The explicit scope decisions documented in this README take precedence for this migration sample.
 
 A future migration does not need to reproduce these exact page numbers or technical components. The important requirement is to preserve the required business behavior and an equivalent level of integrity, maintainability, concurrency safety, security, and usability.
 
